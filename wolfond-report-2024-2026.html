@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Wolfond Chair in Digital Health</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #0a0a0a;
+  --white: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #e5e5e5;
+  --gray-400: #a3a3a3;
+  --gray-500: #737373;
+  --gray-600: #525252;
+  --gray-800: #262626;
+  --gray-900: #171717;
+  --serif: 'Playfair Display', 'Georgia', serif;
+  --sans: 'Inter', -apple-system, system-ui, sans-serif;
+  --transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html { -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--sans);
+  color: var(--black);
+  background: var(--white);
+  line-height: 1.6;
+  overflow: hidden;
+  height: 100dvh;
+}
+
+a { color: var(--black); }
+
+/* ═══ Slide deck ═══ */
+.deck { height: 100dvh; overflow: hidden; position: relative; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none; overflow-y: auto; overflow-x: hidden;
+}
+.slide.active { opacity: 1; transform: translateY(0); pointer-events: auto; z-index: 2; }
+.slide.exiting { opacity: 0; transform: translateY(-30px); pointer-events: none; z-index: 1; }
+
+/* Staggered entrance for child elements */
+.slide.active .stagger { opacity: 0; transform: translateY(24px); animation: staggerIn 0.7s ease forwards; }
+.slide.active .stagger:nth-child(1) { animation-delay: 0.15s; }
+.slide.active .stagger:nth-child(2) { animation-delay: 0.3s; }
+.slide.active .stagger:nth-child(3) { animation-delay: 0.45s; }
+.slide.active .stagger:nth-child(4) { animation-delay: 0.6s; }
+@keyframes staggerIn { to { opacity: 1; transform: translateY(0); } }
+
+/* Initial page load fade */
+body { animation: bodyIn 1s ease forwards; }
+@keyframes bodyIn { from { opacity: 0; } to { opacity: 1; } }
+
+.slide-inner {
+  width: 100%; min-height: 100dvh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 5rem 4rem;
+}
+@media (max-width: 768px) { .slide-inner { padding: 5rem 1.5rem; } }
+
+/* ═══ Top bar ═══ */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.5rem 2.5rem; mix-blend-mode: difference;
+}
+.topbar-logo {
+  font-family: var(--serif); font-size: 0.95rem; font-weight: 600;
+  color: var(--white); text-decoration: none; letter-spacing: -0.01em; cursor: pointer;
+}
+.topbar-domain {
+  font-family: var(--sans); font-size: 0.7rem; font-weight: 400;
+  color: var(--white); opacity: 0.5; letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* ═══ Nav dots ═══ */
+.slide-nav {
+  position: fixed; right: 2.5rem; top: 50%; transform: translateY(-50%);
+  z-index: 100; display: flex; flex-direction: column; gap: 0.6rem;
+  mix-blend-mode: difference;
+}
+.slide-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.25); cursor: pointer;
+  transition: all 0.4s ease; border: none; padding: 0;
+}
+.slide-dot.active { background: var(--white); transform: scale(1.4); }
+.slide-dot:hover { background: rgba(255,255,255,0.6); }
+
+.slide-arrows {
+  position: fixed; bottom: 2.5rem; right: 2.5rem; z-index: 100;
+  display: flex; gap: 0.5rem; mix-blend-mode: difference;
+}
+.slide-arrow {
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3); background: transparent;
+  color: var(--white); cursor: pointer; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
+}
+.slide-arrow:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.6); }
+
+.slide-counter {
+  position: fixed; bottom: 2.75rem; left: 2.5rem; z-index: 100;
+  font-family: var(--sans); font-size: 0.75rem; font-weight: 400;
+  color: var(--white); mix-blend-mode: difference; letter-spacing: 0.08em;
+}
+
+@media (max-width: 768px) {
+  .slide-nav { display: none; }
+  .topbar { padding: 1.25rem 1.5rem; }
+  .slide-arrows { right: 1.5rem; bottom: 1.5rem; }
+  .slide-counter { left: 1.5rem; bottom: 1.75rem; }
+}
+
+/* ═══ Typography ═══ */
+.t-display {
+  font-family: var(--serif); font-size: clamp(2.8rem, 7vw, 6.5rem);
+  font-weight: 400; line-height: 1.05; letter-spacing: -0.03em;
+}
+.t-heading {
+  font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.8rem);
+  font-weight: 400; line-height: 1.12; letter-spacing: -0.02em;
+}
+.t-subheading {
+  font-family: var(--serif); font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 400; line-height: 1.3; letter-spacing: -0.01em;
+}
+.t-body {
+  font-family: var(--sans); font-size: clamp(0.95rem, 1.1vw, 1.1rem);
+  font-weight: 300; line-height: 1.75; color: var(--gray-600); max-width: 58ch;
+}
+.t-caption {
+  font-family: var(--sans); font-size: 0.7rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.14em; color: var(--gray-400);
+}
+.t-italic { font-style: italic; }
+
+/* ═══ Slide variants ═══ */
+.cover { background: var(--black); color: var(--white); }
+.cover .slide-inner { flex-direction: column; text-align: center; gap: 2rem; }
+.cover .t-display { color: var(--white); }
+.cover .t-body { color: rgba(255,255,255,0.5); }
+.cover .t-caption { color: rgba(255,255,255,0.3); }
+
+.split .slide-inner {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  padding: 0; align-items: stretch;
+}
+.split-text {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 5rem 4rem; gap: 1.5rem;
+}
+.split-image { background-size: cover; background-position: center; min-height: 100dvh; }
+.split-reverse .slide-inner { grid-template-columns: 1fr 1fr; }
+.split-reverse .split-image { order: -1; }
+@media (max-width: 900px) {
+  .split .slide-inner, .split-reverse .slide-inner { grid-template-columns: 1fr; }
+  .split-image { min-height: 40vh; order: -1; }
+  .split-text { padding: 3rem 1.5rem; }
+}
+
+/* Text-only deep dive slide */
+.deep-slide .slide-inner {
+  max-width: 900px; margin: 0 auto; flex-direction: column;
+  align-items: flex-start; gap: 2rem; padding-top: 6rem; padding-bottom: 6rem;
+}
+.deep-stat-row {
+  display: flex; gap: 3rem; flex-wrap: wrap; margin: 1rem 0;
+}
+.deep-stat { text-align: left; }
+.deep-stat-val {
+  font-family: var(--serif); font-size: 2.5rem; font-weight: 400; line-height: 1;
+}
+.deep-stat-label {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--gray-400); margin-top: 0.35rem; font-weight: 500;
+}
+.highlight-list { list-style: none; padding: 0; }
+.highlight-list li {
+  padding: 0.75rem 0; border-bottom: 1px solid var(--gray-200);
+  font-size: 0.95rem; font-weight: 300; color: var(--gray-600); line-height: 1.6;
+}
+.highlight-list li:last-child { border-bottom: none; }
+.highlight-list li strong { font-weight: 500; color: var(--black); }
+.dark-slide .highlight-list li { border-color: var(--gray-800); color: rgba(255,255,255,0.55); }
+.dark-slide .highlight-list li strong { color: white; }
+
+.full-image { background-size: cover; background-position: center; color: var(--white); }
+.full-image::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.3) 100%);
+  z-index: 1;
+}
+.full-image .slide-inner { position: relative; z-index: 2; align-items: flex-end; padding-bottom: 6rem; }
+.full-image .t-body { color: rgba(255,255,255,0.6); }
+.full-image .t-caption { color: rgba(255,255,255,0.35); }
+
+.dark-slide { background: var(--black); color: var(--white); }
+.dark-slide .t-body { color: rgba(255,255,255,0.55); }
+.dark-slide .t-caption { color: rgba(255,255,255,0.3); }
+.dark-slide .t-heading { color: var(--white); }
+
+.letter-slide .slide-inner {
+  max-width: 780px; margin: 0 auto; flex-direction: column;
+  gap: 0; padding-top: 6rem; padding-bottom: 6rem; align-items: flex-start;
+}
+.letter-text p {
+  font-family: var(--sans); font-size: 1rem; font-weight: 300;
+  line-height: 1.85; color: var(--gray-600); margin-bottom: 1.25rem;
+}
+.letter-text p:first-child::first-letter {
+  font-family: var(--serif); font-size: 4rem; float: left;
+  line-height: 0.85; margin-right: 0.6rem; margin-top: 0.15rem;
+  color: var(--black); font-weight: 600;
+}
+.letter-sig {
+  font-family: var(--serif); font-size: 1.4rem; font-style: italic;
+  margin-top: 1.5rem; color: var(--black);
+}
+
+.grid-slide .slide-inner {
+  flex-direction: column; align-items: flex-start;
+  max-width: 1200px; margin: 0 auto; gap: 2.5rem; padding-top: 6rem;
+}
+
+/* ═══ Content components ═══ */
+.project-row {
+  display: grid; grid-template-columns: 200px 1fr; gap: 1rem 3rem;
+  padding: 1.75rem 0; border-bottom: 1px solid var(--gray-200); width: 100%;
+  align-items: baseline;
+}
+.project-row:last-child { border-bottom: none; }
+.project-name { font-family: var(--serif); font-size: 1.5rem; font-weight: 500; }
+.project-desc { font-size: 0.95rem; font-weight: 300; color: var(--gray-600); line-height: 1.7; }
+@media (max-width: 768px) { .project-row { grid-template-columns: 1fr; gap: 0.5rem; } }
+
+.pub-row {
+  display: grid; grid-template-columns: 50px 1fr auto; gap: 1rem 1.5rem;
+  padding: 1rem 0; border-bottom: 1px solid var(--gray-200); width: 100%;
+  align-items: baseline; font-size: 0.875rem;
+}
+.pub-row:last-child { border-bottom: none; }
+.pub-yr { font-family: var(--serif); font-weight: 500; color: var(--gray-400); }
+.pub-cite { font-weight: 300; color: var(--gray-600); line-height: 1.6; }
+.pub-cite strong { font-weight: 500; color: var(--black); }
+.pub-link {
+  font-size: 0.75rem; font-weight: 500; text-decoration: none; color: var(--black);
+  border-bottom: 1px solid var(--gray-200); white-space: nowrap; transition: border-color 0.3s;
+}
+.pub-link:hover { border-color: var(--black); }
+a.pub-row:hover { opacity: 0.6; }
+@media (max-width: 768px) { .pub-row { grid-template-columns: 1fr; } }
+
+.team-grid-wrap {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 2.5rem 2rem; width: 100%;
+}
+.team-person { text-align: center; }
+.team-avatar {
+  width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 0.75rem;
+  background: var(--gray-200); display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 1.4rem; color: var(--gray-500);
+}
+.team-person-name { font-weight: 500; font-size: 0.9rem; margin-bottom: 0.15rem; }
+.team-person-role { font-size: 0.75rem; color: var(--gray-500); font-weight: 300; }
+
+.media-row { padding: 1.5rem 0; border-bottom: 1px solid var(--gray-200); width: 100%; }
+.media-row:last-child { border-bottom: none; }
+.media-row a {
+  display: flex; justify-content: space-between; align-items: baseline;
+  text-decoration: none; gap: 2rem; flex-wrap: wrap;
+}
+.media-title {
+  font-family: var(--serif); font-size: 1.15rem; font-weight: 500;
+  color: var(--black); transition: opacity 0.3s;
+}
+.media-row a:hover .media-title { opacity: 0.6; }
+.media-source { font-size: 0.75rem; color: var(--gray-400); font-weight: 400; white-space: nowrap; }
+
+.video-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; width: 100%; }
+.video-wrap { border-radius: 8px; overflow: hidden; background: var(--black); }
+.video-wrap iframe { width: 100%; aspect-ratio: 16/9; display: block; border: none; }
+.video-label { padding: 1rem 0 0; font-size: 0.8rem; color: var(--gray-500); font-weight: 300; }
+@media (max-width: 768px) { .video-pair { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .wolfond-brothers-grid { grid-template-columns: 1fr !important; gap: 3rem !important; } }
+@media (max-width: 900px) { .convo-video-grid { grid-template-columns: 1fr 1fr !important; } }
+@media (max-width: 600px) { .convo-video-grid { grid-template-columns: 1fr !important; } }
+
+.convo-thumb {
+  position: relative; display: block; border-radius: 8px; overflow: hidden;
+  aspect-ratio: 16 / 9; background: var(--gray-800); text-decoration: none; cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.convo-thumb:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+.convo-thumb img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: grayscale(1) contrast(1.1); opacity: 0.85;
+  transition: opacity 0.3s ease;
+}
+.convo-thumb:hover img { opacity: 1; }
+.convo-thumb .thumb-monogram {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 2.5rem; font-weight: 600; color: rgba(255,255,255,0.25);
+  letter-spacing: 0.05em;
+}
+.convo-thumb .thumb-play {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.3s ease;
+}
+.convo-thumb:hover .thumb-play { opacity: 1; }
+.convo-thumb .thumb-play-circle {
+  width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.9);
+  display: flex; align-items: center; justify-content: center;
+}
+.convo-thumb .thumb-play-circle::after {
+  content: ''; display: block; width: 0; height: 0;
+  border-top: 10px solid transparent; border-bottom: 10px solid transparent;
+  border-left: 16px solid var(--black); margin-left: 3px;
+}
+
+.convo-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 2rem; width: 100%;
+}
+.convo-card {
+  padding: 2rem; border: 1px solid var(--gray-200); border-radius: 8px;
+  transition: border-color 0.3s;
+}
+.convo-card:hover { border-color: var(--gray-400); }
+.convo-card h3 { font-family: var(--serif); font-size: 1.2rem; font-weight: 500; margin-bottom: 0.25rem; }
+.convo-card .convo-role {
+  font-size: 0.75rem; color: var(--gray-400); font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem;
+}
+.convo-card p { font-size: 0.875rem; color: var(--gray-600); line-height: 1.6; font-weight: 300; }
+
+.scroll-content {
+  max-height: calc(100dvh - 10rem); overflow-y: auto; width: 100%;
+  padding-right: 1rem; scrollbar-width: thin; scrollbar-color: var(--gray-300) transparent;
+}
+.scroll-content::-webkit-scrollbar { width: 4px; }
+.scroll-content::-webkit-scrollbar-track { background: transparent; }
+.scroll-content::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 4px; }
+
+.pub-filters { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.pub-filter {
+  padding: 0.4rem 1rem; border-radius: 100px; border: 1px solid var(--gray-200);
+  background: transparent; font-family: var(--sans); font-size: 0.75rem;
+  font-weight: 500; color: var(--gray-500); cursor: pointer; transition: all 0.3s;
+}
+.pub-filter:hover { border-color: var(--gray-400); color: var(--black); }
+.pub-filter.active { background: var(--black); color: var(--white); border-color: var(--black); }
+
+.progress-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; height: 2px;
+  background: rgba(255,255,255,0.06); z-index: 100;
+}
+.progress-fill {
+  height: 100%; width: 0%; background: var(--white);
+  mix-blend-mode: difference; transition: width 0.6s ease;
+}
+
+/* ═══ Auto-advance counter ═══ */
+.auto-counter {
+  position: fixed; bottom: 2.95rem; right: 10rem; z-index: 99;
+  font-family: var(--sans); font-size: 0.6rem; font-weight: 400;
+  color: var(--white); mix-blend-mode: difference;
+  letter-spacing: 0.06em; opacity: 0.4;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══ Video Modal ═══ */
+.video-modal {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(10,10,10,0.96); display: none;
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer; backdrop-filter: blur(12px);
+  opacity: 0; transition: opacity 0.35s ease;
+}
+.video-modal.open { display: flex; }
+.video-modal.visible { opacity: 1; }
+.video-modal-brand {
+  position: absolute; top: 1.5rem; left: 2.5rem;
+  font-family: var(--serif); font-size: 0.95rem; font-weight: 600;
+  color: rgba(255,255,255,0.35); letter-spacing: -0.01em;
+  pointer-events: none;
+}
+.video-modal-inner {
+  width: 90vw; max-width: 960px; aspect-ratio: 16/9;
+  position: relative; cursor: default;
+  transform: scale(0.95); transition: transform 0.35s ease;
+}
+.video-modal.visible .video-modal-inner { transform: scale(1); }
+.video-modal-inner iframe {
+  width: 100%; height: 100%; border: none; border-radius: 8px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+}
+.video-modal-close {
+  position: absolute; top: -2.5rem; right: 0;
+  background: none; border: none; color: rgba(255,255,255,0.5);
+  font-size: 1.5rem; cursor: pointer; font-family: var(--sans); font-weight: 300;
+  transition: color 0.2s;
+}
+.video-modal-close:hover { color: white; }
+.video-modal-caption {
+  margin-top: 1.25rem; font-family: var(--sans); font-size: 0.75rem;
+  color: rgba(255,255,255,0.25); font-weight: 400; letter-spacing: 0.06em;
+  text-transform: uppercase; pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<!-- Video Modal Overlay -->
+<div class="video-modal" id="videoModal" onclick="closeVideoModal(event)">
+  <div class="video-modal-brand">The Wolfond Chair</div>
+  <div class="video-modal-inner">
+    <button class="video-modal-close" onclick="closeVideoModal(event)">&times;</button>
+    <iframe id="videoModalFrame" src="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+  </div>
+  <div class="video-modal-caption" id="videoModalCaption"></div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-logo" onclick="goToSlide(0)">The Wolfond Chair</div>
+  <div class="topbar-domain">TheWolfondChair.ca</div>
+</div>
+
+<div class="slide-nav" id="slideNav"></div>
+
+<div class="slide-arrows">
+  <button class="slide-arrow" onclick="prevSlide()" aria-label="Previous">&#8592;</button>
+  <button class="slide-arrow" onclick="nextSlide()" aria-label="Next">&#8594;</button>
+</div>
+
+<div class="slide-counter" id="slideCounter"></div>
+<div class="auto-counter" id="autoCounter"></div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="deck" id="deck"></div>
+
+<script>
+// ═══ DATA ═══
+
+const publications = [
+  { year: 2026, cite: '<strong>Tjhie, R., Cafazzo, J. A., & Montague, E.</strong> Equity Risks in Usability Evaluations of Health Technologies. <em>Human Factors in Healthcare</em>.', doi: '10.1016/j.hfh.2026.100124' },
+  { year: 2025, cite: '<strong>Saha, S., Ross, H. J., et al.</strong> Machine learning enhanced expert system for detecting heart failure decompensation. <em>Scientific Reports</em>.', doi: '10.1038/s41598-025-16376-9' },
+  { year: 2025, cite: '<strong>Abejirinde, I. O., et al.</strong> An equity analysis of remote patient monitoring programs. <em>NPJ Digital Medicine</em>.', doi: '10.1038/s41746-025-01731-x' },
+  { year: 2025, cite: '<strong>Barbaric, A., et al.</strong> Health recommender systems for collaborative decision-making. <em>Digital Health</em>.', doi: '10.1177/20552076241309386' },
+  { year: 2025, cite: '<strong>Buono, F. D., et al.</strong> The Efficacy of iCanCope for Neurofibromatosis Type 1: A Three-Arm RCT. <em>Am J Med Genetics Part A</em>.', doi: '10.1002/ajmga.70004' },
+  { year: 2025, cite: '<strong>Duffy, A., & Pham, Q.</strong> Advancing mental health in university students. <em>World Psychiatry</em>.', doi: '10.1002/wps.21357' },
+  { year: 2025, cite: '<strong>Elfassy, M. D., et al.</strong> Carbon and Travel Cost Reduction From Remote Medication Titration. <em>Canadian Journal of Cardiology</em>.', doi: '10.1016/j.cjca.2025.07.026' },
+  { year: 2025, cite: '<strong>Kilfoy, A., et al.</strong> Understanding parent-oriented mobile health interventions. <em>BMC Pediatrics</em>.', doi: '10.1186/s12887-025-05656-y' },
+  { year: 2025, cite: '<strong>Lo, B., et al.</strong> Sociotechnical Framework for User Engagement With Digital Mental Health Tools. <em>JMIR</em>.', doi: '10.2196/67820' },
+  { year: 2025, cite: '<strong>Lo, B., et al.</strong> Enhancing Effective User Engagement with Digital Mental Health Tools. <em>Stud Health Technol Inform</em>.', doi: '10.3233/SHTI251178' },
+  { year: 2025, cite: '<strong>Mohabir, V., et al.</strong> The transformative potential of digital therapeutics in pediatrics. <em>Pain</em>.', doi: '10.1097/j.pain.0000000000003713' },
+  { year: 2025, cite: '<strong>Papaz, T., et al.</strong> Sudden Cardiac Death Risk Prediction Tool via EHR. <em>CJC Open</em>.', doi: '10.1016/j.cjco.2024.10.002' },
+  { year: 2025, cite: '<strong>Shah, A., et al.</strong> Access to mental health services for people with heart failure. <em>BMJ Open</em>.', doi: '10.1136/bmjopen-2025-098866' },
+  { year: 2025, cite: '<strong>Shammas-Toma, M., et al.</strong> Wearable Technologies in Head and Neck Oncology. <em>JMIR mHealth and uHealth</em>.', doi: '10.2196/72372' },
+  { year: 2025, cite: '<strong>Velmovitsky, P., et al.</strong> Recommendation Engine for Student Mental Health Support. <em>JMIR</em>.', doi: '10.2196/72669' },
+  { year: 2025, cite: '<strong>Wali, S., et al.</strong> Indigenous-Based Methodologies in Ugandan Communities. <em>JMIR Research Protocols</em>.', doi: '10.2196/75136' },
+  { year: 2025, cite: '<strong>West, L., et al.</strong> Digital Health Technologies: Patient Engagement Stakeholder Matrix Study. <em>JMIR</em>.', doi: '10.2196/81463' },
+  { year: 2025, cite: '<strong>Worme, M., et al.</strong> Equity in Heart Failure Care: Marginalization Status in RPM. <em>Can J Cardiol</em>.', doi: '10.1016/j.cjca.2025.11.021' },
+  { year: 2024, cite: '<strong>Brahmbhatt, D. H., et al.</strong> Remote Patient Management in Optimizing GDMT for Heart Failure: An RCT. <em>JACC: Heart Failure</em>.', doi: '10.1016/j.jchf.2024.02.008' },
+  { year: 2024, cite: '<strong>Carrera, A., et al.</strong> Therapies go digital. What drives physicians\' acceptance? <em>PLoS ONE</em>.', doi: '10.1371/journal.pone.0303302' },
+  { year: 2024, cite: '<strong>Clausen, M., et al.</strong> Genetics Adviser: a patient digital health application for genomic testing. <em>Genetics in Medicine Open</em>.', doi: '10.1016/j.gimo.2024.101814' },
+  { year: 2024, cite: '<strong>D\'Amours, G., et al.</strong> Genetics Navigator: RCT protocol for a digital genomic services platform. <em>BMJ Open</em>.', doi: '10.1136/bmjopen-2024-090084' },
+  { year: 2024, cite: '<strong>El-Dassouki, N., et al.</strong> Digitally Mediated Type 1 Diabetes Transition Care. <em>Pediatric Diabetes</em>.', doi: '10.1155/2024/3721768' },
+  { year: 2024, cite: '<strong>Hussain-Shamsy, N., et al.</strong> Virtual connection: videoconferencing-based psychotherapy group. <em>BMC Health Serv Res</em>.', doi: '10.1186/s12913-024-11753-y' },
+  { year: 2024, cite: '<strong>Hussain-Shamsy, N., et al.</strong> Conversational videoconferencing therapy for postpartum depression. <em>Digital Health</em>.', doi: '10.1177/20552076241269630' },
+  { year: 2024, cite: '<strong>Kokorelias, K. M., et al.</strong> Peer-Patient Navigation Program for Youth With Disabilities. <em>JMIR Pediatrics and Parenting</em>.', doi: '10.2196/47545' },
+  { year: 2024, cite: '<strong>Nagpal, M. S., et al.</strong> Managing Type 2 Diabetes During COVID-19. <em>Interactive J Med Res</em>.', doi: '10.2196/49073' },
+  { year: 2024, cite: '<strong>Petrie, S., et al.</strong> Remote Heart Failure Management in Indigenous Communities. <em>CJC Open</em>.', doi: '10.1016/j.cjco.2024.08.011' },
+  { year: 2024, cite: '<strong>Shahil-Feroz, A., et al.</strong> Smartphone-based telemonitoring for pregnant women. <em>Digital Health</em>.', doi: '10.1177/20552076241292682' },
+  { year: 2024, cite: '<strong>Xiong, T., et al.</strong> KTA-Sprint usability assessment for informal caregivers. <em>Human Factors in Healthcare</em>.', doi: '10.1016/j.hfh.2024.100081' },
+  { year: 2024, cite: '<strong>Young, K., et al.</strong> Culturally Adapted Virtual Survivorship App for Chinese Canadian Prostate Cancer Survivors. <em>JMIR Human Factors</em>.', doi: '10.2196/49353' },
+  { year: 2024, cite: '<strong>Hanjahanja-Phiri, T., et al.</strong> Ethical considerations of public health surveillance in the age of IoT. <em>Digital Health</em>.', doi: '10.1177/20552076241296578' },
+];
+
+const team = [
+  { name: 'Sejal Bhalla', role: 'PhD, Computer Science' },
+  { name: 'Antonia Barbaric', role: 'PhD, Health Policy' },
+  { name: 'Ken Christofferson', role: 'PhD, Computer Science' },
+  { name: 'Jaclyn Hearnden', role: 'PhD Student' },
+  { name: 'Alicia Kilfoy', role: 'DrN, Nursing' },
+  { name: 'Brenna Li', role: 'PhD, Computer Science' },
+  { name: 'Salaar Liaqat', role: 'PhD, Computer Science' },
+  { name: 'Derek Liu', role: 'MHA Student' },
+  { name: 'Jennifer Lounsbury', role: 'DrN Candidate' },
+  { name: 'Pedro Miranda', role: 'DrPH Candidate' },
+  { name: 'Soyun Oh', role: 'MSc Student' },
+  { name: 'Delaram Sadatamin', role: 'DrBME Candidate' },
+  { name: 'Pedro Velmovitsky', role: 'Post Doctoral Fellow' },
+  { name: 'Paula Voorheis', role: 'PhD Candidate' },
+  { name: 'Jenny Wei', role: 'MASc Student' },
+  { name: 'Ting Xiong', role: 'PhD Candidate' },
+  { name: 'Karen Young', role: 'MSc Student' },
+];
+
+const TEAM_PHOTOS = {
+  'Dr. Joseph Cafazzo': 'https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/1651243626277-682HGFSB50UU81BYUQYA/Screen+Shot+2022-04-29+at+10.46.33+AM.png',
+  'Dr. Quynh Pham': 'https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/1652802989059-FM7U0ZMUDR5ORJ7VE7QB/Pham_Quynh-1024x1024.jpeg',
+  'Antonia Barbaric': 'https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/1655842475837-GGKSKEEDT6U482UPEY7O/Antonia-Barbaric.jpg',
+  'Ken Christofferson': 'https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/c9b0dba8-d924-440e-a76d-cff6cefc6bdf/Ken.jpg',
+  'Pedro Velmovitsky': 'https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/bf5a0364-49ba-4760-86e7-0b3133a67c0d/IMG_3265.jpg',
+  'Ting Xiong': 'https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/c75943af-0668-40c6-b71a-1305679b8795/IMG_3032.jpg',
+  'Camila Benmessaoud': 'https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/1655757941124-9LWAPS451HFV2KRKLYJQ/Headshot_Camila-Benmessaoud.jpg',
+  'Karan Dave': 'https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/1661891712043-VZ3QD777UZ74JOCD4JLH/Karan.jpg',
+  'Ian Connell': 'https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/8250007a-6b17-4836-992f-a9b1bfef0daa/ian-full-res-2.jpg',
+  'Kevin Tallevi': 'https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/1655838823255-5NU9VJRBG1CN2ZZNQ8KA/DSC02640-1.jpeg',
+  'Dan Franklin': 'images/Daniel_Franklin_500-1.png',
+  'Sejal Bhalla': 'images/sejal_bhalla.jpg',
+  'Brenna Li': 'images/brenna.jpg',
+  'Salaar Liaqat': 'images/Salaar-Liaqat.png',
+  'Alicia Kilfoy': 'images/alicia.jpg',
+  'Derek Liu': 'images/derek_liu.jpg',
+  'Pedro Miranda': 'images/pedro_miranda.jpg',
+  'Soyun Oh': 'images/soyun_oh.jpg',
+  'Delaram Sadatamin': 'images/deleram.jpg',
+  'Paula Voorheis': 'images/voorheis.jpg',
+  'Jenny Wei': 'images/jennywei.jpg',
+  'Karen Young': 'images/karen-young.webp',
+  'Jaclyn Hearnden': 'images/jaclyn-hearnden.jpg',
+  'Jennifer Lounsbury': 'images/Jennifer-Lounsbury.jpg',
+};
+
+function teamAvatar(name) {
+  const photo = TEAM_PHOTOS[name];
+  if (photo) return '<div class="team-avatar" style="background: var(--gray-800);"><img src="' + photo + '" alt="' + name + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:grayscale(1) contrast(1.1);" loading="lazy"></div>';
+  const initials = name.split(' ').map(n => n[0]).join('');
+  return '<div class="team-avatar" style="background: var(--gray-800); color: var(--gray-500);">' + initials + '</div>';
+}
+
+const UHN_IMG = 'https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/44dc6827-46d7-4648-9409-317c43750c7b/UHN+copy.jpg';
+const CAMPUS_IMG = 'https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/1770125905095-TVN9F63XRR1PGHGSU1YH/unsplash-image-aPa843frIzI.jpg';
+
+// ═══ SLIDES ═══
+
+function buildSlides() {
+  return [
+    // 0 — COVER
+    `<div class="slide cover">
+      <div class="slide-inner">
+        <div class="t-caption stagger" style="margin-bottom: 0.5rem;">Annual Report</div>
+        <h1 class="t-display stagger">The Wolfond<br>Chair in<br><em class="t-italic">Digital Health</em></h1>
+        <p class="t-body stagger" style="max-width: 42ch; margin: 0 auto;">University Health Network &middot; Toronto</p>
+      </div>
+    </div>`,
+
+    // 1 — FULL IMAGE STATEMENT
+    `<div class="slide full-image" style="background-image: url('${UHN_IMG}');">
+      <div class="slide-inner">
+        <div style="max-width: 700px;">
+          <p class="t-caption stagger" style="margin-bottom: 1rem;">Our Mission</p>
+          <h2 class="t-heading stagger" style="color: white; margin-bottom: 1.5rem;">We build digital therapeutics that are not only effective, but a genuine joy to use.</h2>
+          <p class="t-body stagger">Inside the world&rsquo;s #2 hospital, the Wolfond Chair funds research that turns into products &mdash; digital therapeutics for heart failure, cancer survivorship, diabetes, chronic pain, mental health, and wearable sensing that actually reach patients.</p>
+        </div>
+      </div>
+    </div>`,
+
+    // 2 — BY THE NUMBERS
+    `<div class="slide dark-slide">
+      <div class="slide-inner" style="flex-direction: column; gap: 3.5rem; text-align: center;">
+        <div class="t-caption stagger">Year in Review</div>
+        <div class="stagger" style="display: flex; gap: 4rem; flex-wrap: wrap; justify-content: center;">
+          <div>
+            <div style="font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 400; color: white; line-height: 1;">3,000+</div>
+            <div class="t-caption" style="margin-top: 0.75rem;">Medly Patients</div>
+          </div>
+          <div>
+            <div style="font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 400; color: white; line-height: 1;">35+</div>
+            <div class="t-caption" style="margin-top: 0.75rem;">Publications</div>
+          </div>
+          <div>
+            <div style="font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 400; color: white; line-height: 1;">$2M</div>
+            <div class="t-caption" style="margin-top: 0.75rem;">CIHR Grant</div>
+          </div>
+          <div>
+            <div style="font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 400; color: white; line-height: 1;">16</div>
+            <div class="t-caption" style="margin-top: 0.75rem;">Graduate Students</div>
+          </div>
+          <div>
+            <div style="font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 400; color: white; line-height: 1;">27</div>
+            <div class="t-caption" style="margin-top: 0.75rem;">Product Releases</div>
+          </div>
+        </div>
+        <div class="stagger" style="font-size: 0.75rem; color: rgba(255,255,255,0.2); margin-top: -1rem;">Inside the world&rsquo;s #2 hospital &middot; Toronto General &middot; Newsweek 2026</div>
+      </div>
+    </div>`,
+
+    // 3 — LETTER
+    `<div class="slide letter-slide">
+      <div class="slide-inner">
+        <div class="t-caption" style="margin-bottom: 1rem;">Letter from the Chair</div>
+        <h2 class="t-subheading" style="margin-bottom: 2rem;">Reflecting on a<br><em class="t-italic">Transformative Year</em></h2>
+        <div class="scroll-content">
+          <div class="letter-text">
+            <p>This has been the most consequential year in the history of our Centre. In February 2026, Newsweek ranked Toronto General Hospital the second-best hospital in the world &mdash; and for eight consecutive years UHN has been the number-one universally accessible hospital on Earth. That is the institution behind this work, and the Wolfond Chair sits at its digital frontier.</p>
+            <p>The milestones speak for themselves. Medly, our flagship heart failure platform, now serves more than 3,000 patients and has been exclusively licensed to VITALL Intelligence for global commercialization. A $2&nbsp;million CIHR grant is taking it international. Our AI-powered diabetes chatbot is in a multicentre randomized trial. Our cancer survivorship platform, Ned, is running across four Canadian hospitals. And our wearables program has moved from concept to filed intellectual property &mdash; proving that consumer earbuds can do the work of clinical cardiac sensors.</p>
+            <p>But numbers don&rsquo;t capture the real story. Every program in these pages exists because someone on our team asked a harder question: what if we could eliminate unnecessary clinic visits for cancer survivors? What if earbuds could detect heart failure? What if a chatbot could coach a teenager through a diabetes transition? The Wolfond family&rsquo;s generosity gives us the freedom to chase those questions.</p>
+            <p>The details follow. What I want to say here is simply: thank you. Your investment is not just funding research &mdash; it is building the tools that will define how the world&rsquo;s best hospital delivers care in the decade ahead.</p>
+          </div>
+          <div class="letter-sig">Joseph A. Cafazzo</div>
+          <div style="font-size: 0.8rem; color: var(--gray-500); font-weight: 300; margin-top: 0.25rem;">PhD, PEng &middot; Wolfond Chair in Digital Health</div>
+        </div>
+      </div>
+    </div>`,
+
+    // 4 — PROJECTS
+    `<div class="slide grid-slide">
+      <div class="slide-inner">
+        <div>
+          <div class="t-caption" style="margin-bottom: 1rem;">Our Programs</div>
+          <h2 class="t-heading">Six programs,<br>one <em class="t-italic">mission</em></h2>
+        </div>
+        <div class="scroll-content">
+          <div class="project-row"><div class="project-name">Medly</div><div class="project-desc">Cuts heart failure hospitalizations in half. 3,000+ patients. Now licensed globally to VITALL Intelligence. $2M CIHR grant. Expanding into cardio-renal-metabolic disease with Boehringer Ingelheim. FDA Breakthrough Device.</div></div>
+          <div class="project-row"><div class="project-name">Caretown</div><div class="project-desc">First platform designed for the patient-caregiver dyad. SickKids PainCare partnership. Now adapting for trauma-informed care with the University of Melbourne.</div></div>
+          <div class="project-row"><div class="project-name">KiT</div><div class="project-desc">LLM chatbot that coaches teenagers through the deadliest gap in diabetes care. AI meal-photo carb estimation. Multicentre RCT across Ontario and Quebec. Expanding to mental health with CAMH.</div></div>
+          <div class="project-row"><div class="project-name">Ned</div><div class="project-desc">Eliminates unnecessary cancer follow-up visits. 174 patients across four hospitals. 81% satisfaction. Freed 25% of clinic capacity.</div></div>
+          <div class="project-row"><div class="project-name">Power Over Pain</div><div class="project-desc">First bilingual AI engine for youth chronic pain, co-designed with the kids themselves. SickKids and Alberta Children&rsquo;s Hospital.</div></div>
+          <div class="project-row"><div class="project-name">Smart Wearables</div><div class="project-desc">Proving that earbuds can do the work of cardiac sensors. Smart Spectral Ring IP filed. Four sub-projects turning consumer devices into medical-grade monitors.</div></div>
+        </div>
+      </div>
+    </div>`,
+
+    // 5 — SPLIT: MEDLY
+    `<div class="slide split">
+      <div class="slide-inner">
+        <div class="split-text">
+          <div class="t-caption">Featured Program</div>
+          <h2 class="t-heading">Medly</h2>
+          <p class="t-body">Medly cuts heart failure hospitalizations in half. That single fact drove a $2M CIHR grant, Health Canada Class II clearance, FDA Breakthrough Device designation, and an exclusive global license with VITALL Intelligence &mdash; all in one year.</p>
+          <p class="t-body">Now with Boehringer Ingelheim, we&rsquo;re building MedlyCRM &mdash; expanding the same model into cardio-renal-metabolic disease, where three chronic conditions collide in one patient. Launch: 2027.</p>
+          <p class="t-body" style="font-style: italic; color: var(--gray-400); font-size: 0.85rem;">50% fewer hospitalizations &middot; 35% fewer clinic visits &middot; 40% faster medication optimization &middot; 3,000+ patients</p>
+        </div>
+        <div class="split-image" style="background-image: url('images/IMG_3073.webp');"></div>
+      </div>
+    </div>`,
+
+    // 6 — MEDLY COMMERCIALIZATION
+    `<div class="slide dark-slide deep-slide">
+      <div class="slide-inner">
+        <div>
+          <div class="t-caption stagger" style="margin-bottom: 0.75rem;">Commercialization</div>
+          <h2 class="t-heading stagger" style="color: white;">From Research to<br><em class="t-italic">Global Market</em></h2>
+        </div>
+        <p class="t-body stagger">Built at UHN and validated with 3,000+ patients, Medly has been exclusively licensed to VITALL Intelligence for global commercialization. In parallel, Boehringer Ingelheim is funding an expansion into cardio-renal-metabolic disease management.</p>
+        <div class="deep-stat-row stagger">
+          <div class="deep-stat"><div class="deep-stat-val" style="color: white;">3,000+</div><div class="deep-stat-label">Patients Supported</div></div>
+          <div class="deep-stat"><div class="deep-stat-val" style="color: white;">50%</div><div class="deep-stat-label">Fewer HF Hospitalizations</div></div>
+          <div class="deep-stat"><div class="deep-stat-val" style="color: white;">VITALL</div><div class="deep-stat-label">Exclusive Global Licensee</div></div>
+        </div>
+        <div class="scroll-content" style="max-height: calc(100dvh - 32rem);">
+          <ul class="highlight-list">
+            <li><strong>VITALL Intelligence Inc.</strong> named UHN&rsquo;s exclusive global licensee (Aug 2025). Commercial availability launched Feb 2026, delivering Medly through VITALL&rsquo;s digital health platform to cardiac centres across North America.</li>
+            <li><strong>Health Canada Class II Medical Device</strong> and <strong>FDA Breakthrough Device</strong> designation. AI features include Auto Titrate, Conversational AI (multilingual), Auto-Documentation, and After-Hours Chatbot.</li>
+            <li><strong>Boehringer Ingelheim partnership</strong> (2023&ndash;present): BI contributing financial resources and consulting to expand Medly across smaller Ontario communities and Indigenous communities in the north.</li>
+            <li><strong>MedlyCRM</strong> (Sep 2025): Expanding beyond heart failure into overlapping cardio-renal-metabolic conditions. Integrating clinical pathways across specialties. Expected clinical adoption 2027.</li>
+            <li><strong>Northern Ontario expansion:</strong> Partnerships with Weeneebayko Area Health Authority and Sioux Lookout First Nations Health Authority bringing specialist heart failure care to remote Indigenous communities.</li>
+            <li><strong>Drs. Heather Ross &amp; Joseph Cafazzo</strong> named UHN Inventors of the Year 2022 for Medly. Cardiovascular disease costs Canada $21+ billion annually &mdash; Medly reduces per-patient burden of ~$27,000/year.</li>
+          </ul>
+        </div>
+      </div>
+    </div>`,
+
+    // 7 — KiT (Keeping in Touch)
+    `<div class="slide deep-slide" style="background: var(--gray-100);">
+      <div class="slide-inner">
+        <div>
+          <div class="t-caption stagger" style="margin-bottom: 0.75rem;">Program Deep Dive</div>
+          <h2 class="t-heading stagger">Keeping in Touch <em class="t-italic">(KiT)</em></h2>
+        </div>
+        <p class="t-body stagger">The gap between pediatric and adult diabetes care kills people. KiT closes it &mdash; an LLM-powered chatbot that coaches young patients through the most dangerous transition in chronic disease management. Now in a multicentre RCT across two provinces.</p>
+        <div class="deep-stat-row stagger">
+          <div class="deep-stat"><div class="deep-stat-val">LLM</div><div class="deep-stat-label">AI-Powered Chatbot</div></div>
+          <div class="deep-stat"><div class="deep-stat-val">2</div><div class="deep-stat-label">Provinces (ON &amp; QC)</div></div>
+          <div class="deep-stat"><div class="deep-stat-val">RCT</div><div class="deep-stat-label">Underway</div></div>
+        </div>
+        <ul class="highlight-list">
+          <li><strong>LLM-powered conversational agent</strong> capable of natural dialogue, multilingual support, and contextual health coaching for Type 1 diabetes management.</li>
+          <li><strong>AI-powered carbohydrate estimation</strong> allows patients to photograph meals and receive instant carbohydrate estimates &mdash; a first in clinical diabetes care.</li>
+          <li><strong>Randomized controlled trial</strong> running across Ontario and Quebec to validate clinical outcomes in diabetes transition care.</li>
+          <li><strong>Collaboration with CAMH</strong> exploring LLM applications in mental health and substance use care.</li>
+        </ul>
+      </div>
+    </div>`,
+
+    // 8 — NED
+    `<div class="slide dark-slide deep-slide">
+      <div class="slide-inner">
+        <div>
+          <div class="t-caption stagger" style="margin-bottom: 0.75rem;">Program Deep Dive</div>
+          <h2 class="t-heading stagger" style="color: white;">Ned</h2>
+        </div>
+        <p class="t-body stagger">Cancer survivors spend years in follow-up clinics waiting for news that almost never comes. Ned eliminates that &mdash; replacing routine visits with asynchronous patient-reported outcomes that escalate only when something is actually wrong. Result: 25% fewer clinic visits, 81% patient satisfaction, and freed oncologist capacity that generated 74% revenue growth.</p>
+        <div class="deep-stat-row stagger">
+          <div class="deep-stat"><div class="deep-stat-val" style="color: white;">174</div><div class="deep-stat-label">Patients Enrolled</div></div>
+          <div class="deep-stat"><div class="deep-stat-val" style="color: white;">81%</div><div class="deep-stat-label">Patient Satisfaction</div></div>
+          <div class="deep-stat"><div class="deep-stat-val" style="color: white;">&lt;2 min</div><div class="deep-stat-label">Clinician Review Time</div></div>
+          <div class="deep-stat"><div class="deep-stat-val" style="color: white;">4</div><div class="deep-stat-label">Sites Across Canada</div></div>
+        </div>
+        <div class="scroll-content" style="max-height: calc(100dvh - 32rem);">
+          <ul class="highlight-list">
+            <li><strong>Pan-Canadian multi-site trial:</strong> Rockyview (Calgary), Trillium (Mississauga), Queen Elizabeth II (Halifax), and UHN (Toronto) &mdash; the largest trial of asynchronous cancer survivorship care in Canadian history.</li>
+            <li><strong>Nurse Ned launched</strong> &mdash; an autonomous nurse-led triage layer with Care Steps, Nurse Touchpoints, and Messenger. Handles routine follow-ups and escalates flagged patients to oncologists.</li>
+            <li><strong>Ned specialist model</strong> eliminated 1 in 4 routine clinic visits and drove 74.4% revenue growth by freeing oncologist capacity for new patients &mdash; proof that asynchronous care isn&rsquo;t just better for patients, it&rsquo;s better economics.</li>
+            <li><strong>Expanding beyond prostate cancer</strong> to testicular, breast, and head &amp; neck cancer, plus cardiac arrest survivorship.</li>
+            <li><strong>Path to sustainability:</strong> Policy change (standard of care adoption) and clinical integration across participating sites.</li>
+          </ul>
+        </div>
+      </div>
+    </div>`,
+
+    // 9 — CARETOWN
+    `<div class="slide split split-reverse">
+      <div class="slide-inner">
+        <div class="split-image" style="background-image: url('images/icair.webp');"></div>
+        <div class="split-text">
+          <div class="t-caption">Program Deep Dive</div>
+          <h2 class="t-heading">Caretown</h2>
+          <p class="t-body">Caregivers are the invisible backbone of chronic disease &mdash; and they&rsquo;re burning out. Caretown is the first platform designed for the patient-caregiver dyad together, not separately. It&rsquo;s now being adapted internationally for trauma-informed care.</p>
+          <div style="display: flex; gap: 1.5rem; margin: 1rem 0;">
+            <div style="text-align: center; width: 80px;">
+              ${teamAvatar('Dr. Quynh Pham')}
+              <div style="font-size: 0.7rem; font-weight: 500; margin-top: 0.35rem;">Dr. Quynh Pham</div>
+              <div style="font-size: 0.6rem; color: var(--gray-500); font-weight: 300;">Lead</div>
+            </div>
+            <div style="text-align: center; width: 80px;">
+              ${teamAvatar('Camila Benmessaoud')}
+              <div style="font-size: 0.7rem; font-weight: 500; margin-top: 0.35rem;">Camila Benmessaoud</div>
+              <div style="font-size: 0.6rem; color: var(--gray-500); font-weight: 300;">Research</div>
+            </div>
+          </div>
+          <ul class="highlight-list">
+            <li><strong>Partnership with SickKids PainCare</strong> extending caregiver support into pediatric chronic pain management.</li>
+            <li><strong>University of Melbourne collaboration</strong> with the Centre for Posttraumatic Mental Health, adapting Caretown for trauma-informed caregiver support.</li>
+            <li><strong>KTA-Sprint usability methodology</strong> validated for informal caregiver populations, published in Human Factors in Healthcare.</li>
+          </ul>
+        </div>
+      </div>
+    </div>`,
+
+    // 10 — SMART WEARABLES
+    `<div class="slide deep-slide">
+      <div class="slide-inner">
+        <div>
+          <div class="t-caption stagger" style="margin-bottom: 0.75rem;">Program Deep Dive</div>
+          <h2 class="t-heading stagger">Smart <em class="t-italic">Wearables</em></h2>
+        </div>
+        <p class="t-body stagger">Our wearables program pushes beyond fitness tracking into genuine clinical sensing &mdash; turning devices billions of people already own into medical-grade cardiac monitors. Ken Christofferson&rsquo;s doctoral thesis is the backbone of a research program generating data and IP that didn&rsquo;t exist two years ago.</p>
+        <div class="scroll-content">
+          <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;">
+            <div style="text-align: center; width: 100px;">
+              <img src="https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/c9b0dba8-d924-440e-a76d-cff6cefc6bdf/Ken.jpg" alt="Ken Christofferson" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; filter: grayscale(1) contrast(1.1);" loading="lazy">
+              <div style="font-size: 0.75rem; font-weight: 500; margin-top: 0.5rem;">Ken Christofferson</div>
+              <div style="font-size: 0.65rem; color: var(--gray-500); font-weight: 300;">Ear-canal sensing</div>
+            </div>
+            <div style="text-align: center; width: 100px;">
+              <img src="images/Daniel_Franklin_500-1.png" alt="Dan Franklin" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; filter: grayscale(1) contrast(1.1);" loading="lazy">
+              <div style="font-size: 0.75rem; font-weight: 500; margin-top: 0.5rem;">Dan Franklin</div>
+              <div style="font-size: 0.65rem; color: var(--gray-500); font-weight: 300;">Smart Spectral Ring</div>
+            </div>
+            <div style="text-align: center; width: 100px;">
+              <img src="https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/8250007a-6b17-4836-992f-a9b1bfef0daa/ian-full-res-2.jpg" alt="Ian Connell" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; filter: grayscale(1) contrast(1.1);" loading="lazy">
+              <div style="font-size: 0.75rem; font-weight: 500; margin-top: 0.5rem;">Ian Connell</div>
+              <div style="font-size: 0.65rem; color: var(--gray-500); font-weight: 300;">Director of Engineering</div>
+            </div>
+            <div style="text-align: center; width: 100px;">
+              <img src="https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/1655838823255-5NU9VJRBG1CN2ZZNQ8KA/DSC02640-1.jpeg" alt="Kevin Tallevi" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; filter: grayscale(1) contrast(1.1);" loading="lazy">
+              <div style="font-size: 0.75rem; font-weight: 500; margin-top: 0.5rem;">Kevin Tallevi</div>
+              <div style="font-size: 0.65rem; color: var(--gray-500); font-weight: 300;">Senior Developer</div>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div style="padding: 2rem; border: 1px solid var(--gray-200); border-radius: 8px;">
+              <div style="font-family: var(--serif); font-size: 1.5rem; font-weight: 500; margin-bottom: 0.75rem;">Smart Spectral Ring</div>
+              <p style="font-size: 0.9rem; color: var(--gray-600); line-height: 1.7; font-weight: 300;">Non-invasive bloodflow estimation via spectral sensing. Moved from concept to <strong style="color: var(--black);">IP disclosure</strong>. Applications in heart failure, dialysis access, and peripheral vascular disease.</p>
+            </div>
+            <div style="padding: 2rem; border: 1px solid var(--gray-200); border-radius: 8px;">
+              <div style="font-family: var(--serif); font-size: 1.5rem; font-weight: 500; margin-bottom: 0.75rem;">EarSteth</div>
+              <p style="font-size: 0.9rem; color: var(--gray-600); line-height: 1.7; font-weight: 300;">Heart sounds from ANC earbuds. <strong style="color: var(--black);">Published research</strong> proving the ear canal is a viable site for stethoscope-grade auscultation.</p>
+            </div>
+            <div style="padding: 2rem; border: 1px solid var(--gray-200); border-radius: 8px;">
+              <div style="font-family: var(--serif); font-size: 1.5rem; font-weight: 500; margin-bottom: 0.75rem;">ArtEARial</div>
+              <p style="font-size: 0.9rem; color: var(--gray-600); line-height: 1.7; font-weight: 300;">Arterial pressure waveforms from the occluded ear canal. A <strong style="color: var(--black);">first-of-its-kind dataset</strong> &mdash; continuous blood pressure from consumer earbuds.</p>
+            </div>
+            <div style="padding: 2rem; border: 1px solid var(--gray-200); border-radius: 8px;">
+              <div style="font-family: var(--serif); font-size: 1.5rem; font-weight: 500; margin-bottom: 0.75rem;">pulsEAR</div>
+              <p style="font-size: 0.9rem; color: var(--gray-600); line-height: 1.7; font-weight: 300;">Hemodynamic assessment via acoustic pulse wave analysis. Building toward <strong style="color: var(--black);">heart failure classification</strong> from a device billions already own.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`,
+
+    // 11 — POWER OVER PAIN
+    `<div class="slide dark-slide">
+      <div class="slide-inner" style="flex-direction: column; gap: 2.5rem; text-align: center; max-width: 800px; margin: 0 auto;">
+        <div class="t-caption stagger">Program Deep Dive</div>
+        <h2 class="t-heading stagger" style="color: white;">Power Over <em class="t-italic">Pain</em></h2>
+        <p class="t-body stagger" style="text-align: center; margin: 0 auto;">Chronic pain in children is undertreated, misunderstood, and isolating. Power Over Pain is the first bilingual AI recommendation engine built <em>with</em> Canadian youth &mdash; not for them. Co-designed with SickKids and Alberta Children&rsquo;s Hospital, it connects young people with the right evidence-based resource at the right moment.</p>
+        <div class="stagger" style="display: flex; gap: 4rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+          <div class="deep-stat"><div class="deep-stat-val" style="color: white;">2</div><div class="deep-stat-label">Languages</div></div>
+          <div class="deep-stat"><div class="deep-stat-val" style="color: white;">3</div><div class="deep-stat-label">Hospital Partners</div></div>
+          <div class="deep-stat"><div class="deep-stat-val" style="color: white;">AI</div><div class="deep-stat-label">Recommendation Engine</div></div>
+        </div>
+      </div>
+    </div>`,
+
+    // 12 — MEDIA
+    `<div class="slide grid-slide">
+      <div class="slide-inner">
+        <div>
+          <div class="t-caption" style="margin-bottom: 1rem;">Media &amp; Recognition</div>
+          <h2 class="t-heading"><em class="t-italic">In the press</em></h2>
+        </div>
+        <div class="scroll-content">
+          <a href="https://torontolife.com/deep-dives/smart-city-20-mind-blowing-toronto-inventions-that-are-changing-the-world/" target="_blank" class="tl-feature">
+            <div class="tl-feature-inner">
+              <div class="tl-art">
+                <img src="images/toronto_life.png" alt="Toronto Life — Medly heart failure app illustration" style="width:100%;height:auto;max-width:240px;border-radius:6px;">
+              </div>
+              <div class="tl-text">
+                <div class="tl-badge">Featured</div>
+                <div class="tl-logo">Toronto Life</div>
+                <div class="tl-headline">20 Mind-Blowing Toronto Inventions That Are Changing the World</div>
+                <div class="tl-sub">Medly ranked <strong>#7</strong> &mdash; a heart-failure app that monitors patients remotely</div>
+                <div class="tl-link">Read the full feature &rarr;</div>
+              </div>
+            </div>
+          </a>
+          <style>
+          .tl-feature{display:block;text-decoration:none;margin-bottom:2.5rem;border:2px solid var(--black);border-radius:10px;overflow:hidden;transition:transform 0.3s,box-shadow 0.3s}
+          .tl-feature:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.12)}
+          .tl-feature-inner{display:flex;align-items:center;gap:2rem;padding:2rem 2.5rem}
+          .tl-art{flex:0 0 200px;display:flex;align-items:center;justify-content:center}
+          .tl-text{flex:1;min-width:0}
+          .tl-badge{display:inline-block;font-size:0.55rem;font-weight:600;text-transform:uppercase;letter-spacing:0.16em;color:white;background:#C0392B;padding:0.25rem 0.7rem;border-radius:3px;margin-bottom:0.6rem}
+          .tl-logo{font-family:var(--serif);font-size:0.85rem;font-weight:600;color:var(--gray-500);margin-bottom:0.75rem;letter-spacing:0.02em}
+          .tl-headline{font-family:var(--serif);font-size:clamp(1.2rem,2.2vw,1.65rem);font-weight:600;line-height:1.25;color:var(--black);margin-bottom:0.6rem}
+          .tl-sub{font-size:0.8rem;color:var(--gray-500);font-weight:300;line-height:1.5}
+          .tl-sub strong{font-weight:600;color:var(--black)}
+          .tl-link{margin-top:0.9rem;font-size:0.72rem;font-weight:500;color:var(--black);letter-spacing:0.04em;transition:color 0.3s}
+          .tl-feature:hover .tl-link{text-decoration:underline}
+          @media(max-width:700px){.tl-feature-inner{flex-direction:column;text-align:center;gap:1rem}.tl-art{flex:none;width:160px}}
+          </style>
+          <div class="media-row"><a href="https://www.ctvnews.ca/toronto/video/2025/06/20/uhns-toronto-rehab-program-has-a-new-tool-to-help-cardiac-patients/" target="_blank"><span class="media-title">UHN's Toronto Rehab Program Helps Cardiac Patients</span><span class="media-source">CTV News</span></a></div>
+          <div class="media-row"><a href="https://www.newswire.ca/news-releases/new-health-initiative-aims-to-improve-care-for-canadians-with-overlapping-heart-kidney-and-metabolic-diseases-822429575.html" target="_blank"><span class="media-title">MedlyCRM: UHN &amp; Boehringer Ingelheim Tackle Heart-Kidney-Metabolic Disease</span><span class="media-source">Newswire</span></a></div>
+          <div class="media-row"><a href="https://ihpme.utoronto.ca/2025/02/medly-goes-international-ihpme-researchers-receive-2m-cihr-grant-to-expand-heart-failure-management-tool/" target="_blank"><span class="media-title">Medly Goes International: $2M CIHR Grant</span><span class="media-source">IHPME, U of T</span></a></div>
+          <div class="media-row"><a href="https://www.waha.ca/news/waha-and-uhn-win-provincial-award-for-innovative-cardiac-care/" target="_blank"><span class="media-title">WAHA and UHN Win Provincial Award</span><span class="media-source">WAHA</span></a></div>
+          <div class="media-row"><a href="https://www.canhealth.com/2026/02/25/uhns-medly-now-available-through-vitall/" target="_blank"><span class="media-title">UHN&rsquo;s Medly Now Available Through VITALL</span><span class="media-source">CanHealth</span></a></div>
+          <div class="media-row"><a href="https://www.oha.com/news/scaling-from-within-medly%E2%80%99s-digital-health-journey" target="_blank"><span class="media-title">Scaling From Within: Medly&rsquo;s Digital Health Journey</span><span class="media-source">OHA</span></a></div>
+          <div style="margin-top: 2.5rem;">
+            <div class="video-pair">
+              <div style="position: relative;"><div class="video-wrap" style="position: relative;"><iframe id="mediaCdtxFrame" src="" title="CDTx Overview" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe><button class="video-mute-btn" data-target="mediaCdtxFrame" data-muted="true" onclick="toggleVideoMute(this)" style="position:absolute;bottom:12px;right:12px;z-index:10;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.6);color:white;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:all 0.2s;">&#128263;</button></div><div class="video-label">Centre for Digital Therapeutics</div></div>
+              <div style="position: relative;"><div class="video-wrap" style="position: relative;"><iframe id="mediaChinFrame" src="" title="CHIN Radio Interview" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe><button class="video-mute-btn" data-target="mediaChinFrame" data-muted="true" onclick="toggleVideoMute(this)" style="position:absolute;bottom:12px;right:12px;z-index:10;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.6);color:white;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:all 0.2s;">&#128263;</button></div><div class="video-label">Stella Kozusco, CHIN Radio Interview</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`,
+
+    // 13 — CONVERSATIONS
+    `<div class="slide grid-slide" style="background: var(--gray-100);">
+      <div class="slide-inner">
+        <div>
+          <div class="t-caption stagger" style="margin-bottom: 1rem;">Conversations</div>
+          <h2 class="t-heading stagger">Voices from<br><em class="t-italic">the Centre</em></h2>
+          <p class="t-body stagger" style="margin-top: 0.75rem;">Short video interviews with the researchers and students whose work defines the Chair.</p>
+        </div>
+        <div class="scroll-content">
+          <div class="convo-video-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; width: 100%; margin-bottom: 2rem;">
+            <div data-convo-index="0"><div class="convo-thumb" onclick="openVideoModal('1169672887','Jaclyn Hearnden')"><img src="images/jaclyn-hearnden.jpg" alt="Jaclyn Hearnden" loading="lazy"><span class="thumb-play"><span class="thumb-play-circle"></span></span></div><div class="video-label">Jaclyn Hearnden</div></div>
+            <div data-convo-index="1"><div class="convo-thumb" onclick="openVideoModal('1169673203','Jenny Wei')"><img src="images/jennywei.jpg" alt="Jenny Wei" loading="lazy"><span class="thumb-play"><span class="thumb-play-circle"></span></span></div><div class="video-label">Jenny Wei</div></div>
+            <div data-convo-index="2"><div class="convo-thumb" onclick="openVideoModal('1169673412','Soyun Oh')"><img src="images/soyun_oh.jpg" alt="Soyun Oh" loading="lazy"><span class="thumb-play"><span class="thumb-play-circle"></span></span></div><div class="video-label">Soyun Oh</div></div>
+            <div data-convo-index="3"><div class="convo-thumb" onclick="openVideoModal('1169673903','Ken Christofferson')"><img src="https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/c9b0dba8-d924-440e-a76d-cff6cefc6bdf/Ken.jpg" alt="Ken Christofferson" loading="lazy"><span class="thumb-play"><span class="thumb-play-circle"></span></span></div><div class="video-label">Ken Christofferson</div></div>
+            <div data-convo-index="4"><div class="convo-thumb" onclick="openVideoModal('1169673570','Ting Xiong')"><img src="https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/c75943af-0668-40c6-b71a-1305679b8795/IMG_3032.jpg" alt="Ting Xiong" loading="lazy"><span class="thumb-play"><span class="thumb-play-circle"></span></span></div><div class="video-label">Ting Xiong</div></div>
+          </div>
+          <div class="convo-grid">
+            <div class="convo-card" style="background: white;">
+              <h3>Jaclyn Hearnden</h3><div class="convo-role">PhD Student</div>
+              <p>On designing for equity in digital health &mdash; how usability evaluations can perpetuate disparities, and what we&rsquo;re doing to change that. Jaclyn&rsquo;s work challenges the field to rethink who gets included in the design process.</p>
+            </div>
+            <div class="convo-card" style="background: white;">
+              <h3>Jenny Wei</h3><div class="convo-role">MASc Student</div>
+              <p>On transforming consumer earbuds into cardiac sensing platforms. Jenny is building the dataset that proves the ear canal is one of the richest vascular signal sources on the human body — and that we're all already wearing the sensors.</p>
+            </div>
+            <div class="convo-card" style="background: white;">
+              <h3>Soyun Oh</h3><div class="convo-role">MSc Student</div>
+              <p>On the evolving landscape of digital mental health. Soyun's research focuses on co-designing with diverse student communities, building recommendation engines that connect young people with the right support at the right moment.</p>
+            </div>
+            <div class="convo-card" style="background: white;">
+              <h3>Ken Christofferson</h3><div class="convo-role">PhD, Computer Science</div>
+              <p>On turning earbuds into medical devices. Ken&rsquo;s doctoral thesis explores cardiovascular assessment from the occluded ear canal &mdash; building EarSteth, ArtEARial, and pulsEAR, three projects that could transform how we monitor heart health using devices billions already own.</p>
+            </div>
+            <div class="convo-card" style="background: white;">
+              <h3>Ting Xiong</h3><div class="convo-role">PhD Candidate</div>
+              <p>On caregiver-centred design and why technology must support the whole care circle, not just the patient. Ting's KTA-Sprint methodology is changing how we evaluate usability with informal caregivers.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`,
+
+    // 14 — PUBLICATIONS
+    `<div class="slide grid-slide">
+      <div class="slide-inner">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div class="t-caption" style="margin-bottom: 1rem;">Research Output</div>
+            <h2 class="t-heading"><em class="t-italic">Publications</em></h2>
+          </div>
+          <div style="font-size: 0.8rem; color: var(--gray-400);">${publications.length} peer-reviewed papers</div>
+        </div>
+        <div class="scroll-content" id="pubScrollArea">
+          <div id="pubList"></div>
+        </div>
+      </div>
+    </div>`,
+
+    // 15 — TEAM
+    `<div class="slide grid-slide dark-slide">
+      <div class="slide-inner" style="text-align: center; align-items: center;">
+        <div>
+          <div class="t-caption" style="margin-bottom: 1rem;">Thank You</div>
+          <h2 class="t-heading" style="color: white;">The <em class="t-italic">people</em> behind<br>the work</h2>
+          <p class="t-body" style="margin: 1rem auto 0; text-align: center;">Every program in this report was built by these people. The Wolfond Chair doesn&rsquo;t just fund research &mdash; it funds researchers.</p>
+        </div>
+        <div style="width: 100%;">
+          <div style="display: flex; justify-content: center; gap: 4rem; flex-wrap: wrap; margin-bottom: 3rem;">
+            <div class="team-person">${teamAvatar('Dr. Joseph Cafazzo')}<div class="team-person-name" style="color: white;">Dr. Joseph Cafazzo</div><div class="team-person-role">Wolfond Chair in Digital Health</div></div>
+            <div class="team-person">${teamAvatar('Dr. Quynh Pham')}<div class="team-person-name" style="color: white;">Dr. Quynh Pham</div><div class="team-person-role">Director, CDTx</div></div>
+            <div class="team-person">${teamAvatar('Ian Connell')}<div class="team-person-name" style="color: white;">Ian Connell</div><div class="team-person-role">Director of Engineering</div></div>
+          </div>
+          <div style="width: 100%; height: 1px; background: var(--gray-800); margin-bottom: 2.5rem;"></div>
+          <div class="team-grid-wrap">
+            ${team.map(m => `<div class="team-person">${teamAvatar(m.name)}<div class="team-person-name" style="color: white;">${m.name}</div><div class="team-person-role">${m.role}</div></div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`,
+
+    // 16 — CLOSING
+    `<div class="slide full-image" style="background-image: url('${CAMPUS_IMG}');">
+      <div class="slide-inner" style="align-items: center; padding-bottom: 5rem; text-align: center;">
+        <div>
+          <div class="t-caption stagger" style="margin-bottom: 1.5rem;">Thank You</div>
+          <h2 class="t-display stagger" style="font-size: clamp(2rem, 5vw, 4.5rem); color: white;">Together, we are<br>shaping the future of<br><em class="t-italic">healthcare.</em></h2>
+          <div class="stagger" style="margin-top: 2rem;">
+            <a href="https://centrefordigitaltherapeutics.ca" target="_blank" style="color: rgba(255,255,255,0.4); font-size: 0.8rem; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.15);">centrefordigitaltherapeutics.ca</a>
+          </div>
+          <p class="stagger" style="margin-top: 3rem; font-size: 0.7rem; color: rgba(255,255,255,0.2);">The Wolfond Chair in Digital Health &middot; Centre for Digital Therapeutics &middot; University Health Network &middot; Toronto</p>
+        </div>
+      </div>
+    </div>`,
+
+    // 17 — THE WOLFOND BROTHERS (Easter egg)
+    `<div class="slide dark-slide">
+      <div class="slide-inner" style="max-width: 1100px; margin: 0 auto; padding-top: 4rem; padding-bottom: 4rem;">
+        <div class="t-caption stagger" style="opacity: 0.4; text-align: center; width: 100%; margin-bottom: 2rem;">The Wolfond Family</div>
+        <div class="wolfond-brothers-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; width: 100%; align-items: start;">
+          <!-- Greg -->
+          <div style="text-align: center;">
+            <h2 class="t-display stagger" style="font-size: clamp(1.6rem, 3.5vw, 2.8rem); color: white; line-height: 1.15; margin-bottom: 1.25rem;">Greg<br><em class="t-italic">Wolfond</em></h2>
+            <p class="stagger" style="font-size: 0.85rem; color: var(--gray-400); line-height: 1.7; font-weight: 300; max-width: 38ch; margin: 0 auto 1.5rem;">Entrepreneur and philanthropist. Together with Henry, the Wolfond family&rsquo;s generosity established the Chair in Digital Health at UHN.</p>
+            <div class="stagger" id="gregVideoWrap">
+              <div style="width: 100%; max-width: 380px; margin: 0 auto; border-radius: 8px; overflow: hidden; aspect-ratio: 16/9; background: var(--gray-900); position: relative; cursor: pointer;" onclick="openVideoModal('1169716954','Greg Wolfond')">
+                <iframe id="gregAutoplayFrame" src="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="width: 100%; height: 100%; border: none; pointer-events: none;"></iframe>
+                <span class="thumb-play" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;"><span class="thumb-play-circle"></span></span>
+              </div>
+              <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--gray-500); font-weight: 300;">A conversation with Greg</div>
+            </div>
+            <div class="stagger" style="margin-top: 1.25rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+              <a href="https://givebackhealth.org/board-of-directors" target="_blank" style="color: rgba(255,255,255,0.5); font-size: 0.8rem; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.15);">Give Back Health</a>
+            </div>
+          </div>
+          <!-- Henry -->
+          <div style="text-align: center;">
+            <h2 class="t-display stagger" style="font-size: clamp(1.6rem, 3.5vw, 2.8rem); color: white; line-height: 1.15; margin-bottom: 1.25rem;">Henry<br><em class="t-italic">Wolfond</em></h2>
+            <p class="stagger" style="font-size: 0.85rem; color: var(--gray-400); line-height: 1.7; font-weight: 300; max-width: 38ch; margin: 0 auto 1.5rem;">Aviator, philanthropist, and &mdash; as of November&nbsp;22,&nbsp;2024 &mdash; astronaut aboard Blue Origin&rsquo;s NS-28.</p>
+            <div class="stagger">
+              <img src="https://thecjn.ca/wp-content/uploads/2024/11/ns-28-egress-henry-wolfond-e1732651901698.jpg" alt="Henry Wolfond after Blue Origin NS-28 landing" style="width: 100%; max-width: 380px; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px; filter: grayscale(1) contrast(1.1); display: block; margin: 0 auto;">
+              <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--gray-500); font-weight: 300;">NS-28 capsule exit &middot; Nov 2024</div>
+            </div>
+            <div class="stagger" style="margin-top: 1.25rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+              <a href="https://www.blueorigin.com/news/new-shepard-ns-28-mission" target="_blank" style="color: rgba(255,255,255,0.5); font-size: 0.8rem; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.15);">Blue Origin Mission</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`,
+  ];
+}
+
+// ═══ VIDEO MODAL ═══
+function openVideoModal(vimeoId, caption) {
+  const modal = document.getElementById('videoModal');
+  const frame = document.getElementById('videoModalFrame');
+  const cap = document.getElementById('videoModalCaption');
+  frame.src = 'https://player.vimeo.com/video/' + vimeoId + '?autoplay=1&title=0&byline=0&portrait=0';
+  cap.textContent = caption || 'Voices from the Centre';
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(() => { requestAnimationFrame(() => { modal.classList.add('visible'); }); });
+}
+function closeVideoModal(e) {
+  if (e && e.target.closest('.video-modal-inner') && !e.target.closest('.video-modal-close')) return;
+  const modal = document.getElementById('videoModal');
+  const frame = document.getElementById('videoModalFrame');
+  modal.classList.remove('visible');
+  setTimeout(() => { frame.src = ''; modal.classList.remove('open'); }, 350);
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('videoModal').classList.contains('open')) {
+    closeVideoModal();
+  }
+});
+
+// ═══ CONVERSATIONS AUTO-PLAY (inside existing thumbnails) ═══
+const CONVO_VIDEOS = [
+  { id: '1169672887', name: 'Jaclyn Hearnden' },
+  { id: '1169673203', name: 'Jenny Wei' },
+  { id: '1169673412', name: 'Soyun Oh' },
+  { id: '1169673903', name: 'Ken Christofferson' },
+  { id: '1169673570', name: 'Ting Xiong' },
+];
+const CONVO_SLIDE_INDEX = 13;
+let convoPickIndex = -1;
+
+function setupConvoAutoplay() {
+  convoPickIndex = Math.floor(Math.random() * CONVO_VIDEOS.length);
+}
+
+function startConvoAutoplay() {
+  if (convoPickIndex < 0) return;
+  const slot = document.querySelector('[data-convo-index="' + convoPickIndex + '"]');
+  if (!slot) return;
+  const thumb = slot.querySelector('.convo-thumb');
+  if (!thumb || thumb.querySelector('.convo-inline-video')) return;
+  const vid = CONVO_VIDEOS[convoPickIndex];
+  const iframe = document.createElement('iframe');
+  iframe.className = 'convo-inline-video';
+  iframe.src = 'https://player.vimeo.com/video/' + vid.id + '?background=1&autoplay=1&muted=1&loop=1';
+  iframe.allow = 'autoplay';
+  iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;z-index:1;pointer-events:none;border-radius:8px;';
+  // Hide the static image behind the video
+  const img = thumb.querySelector('img');
+  if (img) img.style.opacity = '0';
+  thumb.appendChild(iframe);
+}
+
+function stopConvoAutoplay() {
+  document.querySelectorAll('.convo-inline-video').forEach(f => {
+    const thumb = f.closest('.convo-thumb');
+    if (thumb) { const img = thumb.querySelector('img'); if (img) img.style.opacity = '0.85'; }
+    f.remove();
+  });
+}
+
+// ═══ VIDEO MUTE TOGGLE (Media page) ═══
+function toggleVideoMute(btn) {
+  var targetId = btn.getAttribute('data-target');
+  var iframe = document.getElementById(targetId);
+  if (!iframe || !iframe.src || iframe.src === '') return;
+  var muted = btn.getAttribute('data-muted') === 'true';
+  var src = iframe.src;
+  if (muted) {
+    // Unmute: swap muted=1 → muted=0, keep background=1 for no UI
+    iframe.src = src.replace('muted=1', 'muted=0');
+    btn.setAttribute('data-muted', 'false');
+    btn.textContent = '\u{1F50A}';
+    btn.style.borderColor = 'rgba(255,255,255,0.7)';
+  } else {
+    // Mute: swap muted=0 → muted=1
+    iframe.src = src.replace('muted=0', 'muted=1');
+    btn.setAttribute('data-muted', 'true');
+    btn.textContent = '\u{1F507}';
+    btn.style.borderColor = 'rgba(255,255,255,0.3)';
+  }
+}
+
+// ═══ AUTO-ADVANCE TIMER ═══
+let autoTimer = null;
+let countdownTimer = null;
+let secondsLeft = 120;
+const AUTO_SECONDS = 120; // 2 minutes
+
+function updateCounterDisplay() {
+  const el = document.getElementById('autoCounter');
+  if (!el) return;
+  const m = Math.floor(secondsLeft / 60);
+  const s = secondsLeft % 60;
+  el.textContent = m + ':' + String(s).padStart(2, '0');
+}
+
+function startAutoAdvance() {
+  stopAutoAdvance();
+  secondsLeft = AUTO_SECONDS;
+  updateCounterDisplay();
+  countdownTimer = setInterval(() => {
+    secondsLeft--;
+    if (secondsLeft < 0) secondsLeft = 0;
+    updateCounterDisplay();
+  }, 1000);
+  autoTimer = setInterval(() => {
+    if (document.getElementById('videoModal').classList.contains('open')) return;
+    if (current < slides.length - 1) {
+      goToSlide(current + 1);
+    } else {
+      goToSlide(0);
+    }
+  }, AUTO_SECONDS * 1000);
+}
+
+function stopAutoAdvance() {
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+}
+
+function resetAutoAdvance() {
+  startAutoAdvance();
+}
+
+// ═══ ENGINE ═══
+let current = 0;
+let slides = [];
+let isTransitioning = false;
+
+function init() {
+  const deck = document.getElementById('deck');
+  const slidesHTML = buildSlides();
+  deck.innerHTML = slidesHTML.join('');
+  slides = deck.querySelectorAll('.slide');
+
+  const nav = document.getElementById('slideNav');
+  nav.innerHTML = slidesHTML.map((_, i) =>
+    `<button class="slide-dot${i===0?' active':''}" onclick="goToSlide(${i})" aria-label="Slide ${i+1}"></button>`
+  ).join('');
+
+  slides[0].classList.add('active');
+  updateCounter();
+  buildPubList();
+  setupConvoAutoplay();
+  startAutoAdvance();
+}
+
+function goToSlide(index) {
+  if (index === current || isTransitioning || index < 0 || index >= slides.length) return;
+  isTransitioning = true;
+  const prev = slides[current];
+  const next = slides[index];
+  prev.classList.remove('active');
+  prev.classList.add('exiting');
+  next.classList.add('active');
+  setTimeout(() => { prev.classList.remove('exiting'); isTransitioning = false; }, 800);
+  current = index;
+  document.querySelectorAll('.slide-dot').forEach((d, i) => d.classList.toggle('active', i === current));
+  updateCounter();
+  // Autoplay Media videos on the Media slide (index 12)
+  const cdtxFrame = document.getElementById('mediaCdtxFrame');
+  const chinFrame = document.getElementById('mediaChinFrame');
+  if (cdtxFrame) {
+    if (index === 12) {
+      cdtxFrame.src = 'https://player.vimeo.com/video/1169720277?background=1&autoplay=1&muted=1&loop=1';
+    } else {
+      cdtxFrame.src = '';
+    }
+  }
+  if (chinFrame) {
+    if (index === 12) {
+      chinFrame.src = 'https://player.vimeo.com/video/1169720780?background=1&autoplay=1&muted=1&loop=1&texttrack=en';
+    } else {
+      chinFrame.src = '';
+    }
+  }
+  // Reset mute buttons to muted state when entering Media slide
+  if (index === 12) {
+    document.querySelectorAll('.video-mute-btn').forEach(function(btn) {
+      btn.setAttribute('data-muted', 'true');
+      btn.textContent = '\u{1F507}';
+      btn.style.borderColor = 'rgba(255,255,255,0.3)';
+    });
+  }
+  // Autoplay Greg's video on the Wolfond Brothers slide
+  const gregFrame = document.getElementById('gregAutoplayFrame');
+  if (gregFrame) {
+    if (index === slides.length - 1) {
+      gregFrame.src = 'https://player.vimeo.com/video/1169716954?background=1&autoplay=1&muted=1&loop=1';
+    } else {
+      gregFrame.src = '';
+    }
+  }
+  // Autoplay random conversation video on Conversations slide
+  if (index === CONVO_SLIDE_INDEX) {
+    startConvoAutoplay();
+  } else {
+    stopConvoAutoplay();
+  }
+  // Reset auto-advance timer on any navigation
+  resetAutoAdvance();
+}
+
+function nextSlide() { goToSlide(current + 1); resetAutoAdvance(); }
+function prevSlide() { goToSlide(current - 1); resetAutoAdvance(); }
+function updateCounter() {
+  document.getElementById('slideCounter').textContent =
+    String(current + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+  const pct = ((current) / (slides.length - 1)) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// Keyboard
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
+});
+
+// Touch — let scrollable content scroll, swipe left/right to advance
+let touchStartY = 0, touchStartX = 0;
+document.addEventListener('touchstart', (e) => {
+  touchStartY = e.touches[0].clientY; touchStartX = e.touches[0].clientX;
+}, { passive: true });
+document.addEventListener('touchend', (e) => {
+  const dy = touchStartY - e.changedTouches[0].clientY;
+  const dx = touchStartX - e.changedTouches[0].clientX;
+  // Horizontal swipe always advances (left/right)
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 0) nextSlide(); else prevSlide();
+    return;
+  }
+  // Vertical swipe — only advance if no scrollable content on this slide
+  if (Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx)) {
+    const scrollEl = slides[current].querySelector('.scroll-content');
+    if (scrollEl && scrollEl.scrollHeight > scrollEl.clientHeight + 4) return;
+    if (dy > 0) nextSlide(); else prevSlide();
+  }
+});
+
+// Mouse wheel — only advance slides when NOT inside scrollable content
+let wheelTimeout = null;
+let edgeScrollCount = 0;
+document.addEventListener('wheel', (e) => {
+  // Check if the current slide has scrollable content
+  const scrollEl = e.target.closest('.scroll-content') || slides[current].querySelector('.scroll-content');
+  if (scrollEl && scrollEl.scrollHeight > scrollEl.clientHeight + 4) {
+    // Content is scrollable — let it scroll freely
+    const atTop = scrollEl.scrollTop <= 1;
+    const atBottom = scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 4;
+    const goingUp = e.deltaY < 0;
+    const goingDown = e.deltaY > 0;
+    // Only consider advancing after user has scrolled past edge multiple times
+    if ((goingUp && atTop) || (goingDown && atBottom)) {
+      edgeScrollCount++;
+      if (edgeScrollCount < 3) return; // require 3 edge scrolls before advancing
+      edgeScrollCount = 0;
+    } else {
+      edgeScrollCount = 0;
+      return; // let the content scroll normally
+    }
+  }
+  e.preventDefault();
+  if (wheelTimeout) return;
+  wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
+  if (e.deltaY > 0) nextSlide(); else prevSlide();
+}, { passive: false });
+
+// ═══ PUB LIST ═══
+function buildPubList() {
+  const list = document.getElementById('pubList');
+  if (!list) return;
+  list.innerHTML = publications.map(p => `
+    <a href="https://doi.org/${p.doi}" target="_blank" class="pub-row" style="text-decoration: none; display: grid; grid-template-columns: 50px 1fr; gap: 1rem 1.5rem; padding: 1.25rem 0; border-bottom: 1px solid var(--gray-200); width: 100%; align-items: baseline; transition: opacity 0.2s;">
+      <div class="pub-yr">${p.year}</div>
+      <div class="pub-cite">${p.cite}</div>
+    </a>
+  `).join('');
+}
+
+window.addEventListener('load', init);
+</script>
+</body>
+</html>

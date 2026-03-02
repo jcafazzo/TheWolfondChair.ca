@@ -1,0 +1,14 @@
+# Source materials — not needed for the website
+*.mp4
+*.pptx
+*.pdf
+*.DS_Store
+VIDEO-GUIDE.md
+inspiration.md
+media_urls.md
+medly-commercialization-refs.md
+styles_cdtx.md
+additional content/
+publications/
+assets/
+Wolfond 2025 report/
