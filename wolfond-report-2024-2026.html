@@ -42,7 +42,7 @@ a { color: var(--black); }
 
 .slide {
   position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: flex-start; justify-content: center;
   opacity: 0; transform: translateY(40px);
   transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none; overflow-y: auto; overflow-x: hidden;
@@ -189,7 +189,7 @@ body { animation: bodyIn 1s ease forwards; }
 /* Text-only deep dive slide */
 .deep-slide .slide-inner {
   max-width: 900px; margin: 0 auto; flex-direction: column;
-  align-items: flex-start; gap: 2rem; padding-top: 6rem; padding-bottom: 6rem;
+  align-items: flex-start; justify-content: flex-start; gap: 2rem; padding-top: 6rem; padding-bottom: 6rem;
 }
 .deep-stat-row {
   display: flex; gap: 3rem; flex-wrap: wrap; margin: 1rem 0;
@@ -229,7 +229,7 @@ body { animation: bodyIn 1s ease forwards; }
 
 .letter-slide .slide-inner {
   max-width: 780px; margin: 0 auto; flex-direction: column;
-  gap: 0; padding-top: 6rem; padding-bottom: 6rem; align-items: flex-start;
+  gap: 0; padding-top: 6rem; padding-bottom: 6rem; align-items: flex-start; justify-content: flex-start;
 }
 .letter-text p {
   font-family: var(--sans); font-size: 1rem; font-weight: 300;
@@ -246,7 +246,7 @@ body { animation: bodyIn 1s ease forwards; }
 }
 
 .grid-slide .slide-inner {
-  flex-direction: column; align-items: flex-start;
+  flex-direction: column; align-items: flex-start; justify-content: flex-start;
   max-width: 1200px; margin: 0 auto; gap: 2.5rem; padding-top: 6rem;
 }
 
@@ -588,7 +588,7 @@ function buildSlides() {
 
     // 2 — BY THE NUMBERS
     `<div class="slide dark-slide">
-      <div class="slide-inner" style="flex-direction: column; gap: 3.5rem; text-align: center;">
+      <div class="slide-inner" style="flex-direction: column; justify-content: flex-start; gap: 3.5rem; text-align: center;">
         <div class="t-caption stagger">Year in Review</div>
         <div class="stagger" style="display: flex; gap: 4rem; flex-wrap: wrap; justify-content: center;">
           <div>
@@ -824,7 +824,7 @@ function buildSlides() {
 
     // 11 — POWER OVER PAIN
     `<div class="slide dark-slide">
-      <div class="slide-inner" style="flex-direction: column; gap: 2.5rem; text-align: center; max-width: 800px; margin: 0 auto;">
+      <div class="slide-inner" style="flex-direction: column; justify-content: flex-start; gap: 2.5rem; text-align: center; max-width: 800px; margin: 0 auto;">
         <div class="t-caption stagger">Program Deep Dive</div>
         <h2 class="t-heading stagger" style="color: white;">Power Over <em class="t-italic">Pain</em></h2>
         <p class="t-body stagger" style="text-align: center; margin: 0 auto;">Chronic pain in children is undertreated, misunderstood, and isolating. Power Over Pain is the first bilingual AI recommendation engine built <em>with</em> Canadian youth &mdash; not for them. Co-designed with SickKids and Alberta Children&rsquo;s Hospital, it connects young people with the right evidence-based resource at the right moment.</p>
