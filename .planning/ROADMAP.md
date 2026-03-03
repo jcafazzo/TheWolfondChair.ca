@@ -27,7 +27,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Tapping nav dots and arrows registers immediately with no 300ms delay, and touch targets are large enough to hit accurately
   4. Swiping horizontally on any slide changes the slide; swiping vertically on a scrollable slide scrolls the content
   5. The auto-advance timer pauses when the user switches to another tab and resumes when they return
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 01-01-PLAN.md — CSS mobile fixes: viewport units, touch-action, overscroll-behavior, dot touch targets
+- [ ] 01-02-PLAN.md — JS mobile fixes: touch handler bug fix, Page Visibility API timer pause/resume
+- [ ] 01-03-PLAN.md — Mobile verification checkpoint: real device testing of all fixes
 
 ### Phase 2: Playwright Tests
 **Goal**: Automated E2E tests cover all navigation patterns and mobile viewport behavior, and confirm the desktop experience is unchanged
@@ -48,5 +51,5 @@ Phases execute in numeric order: 1 → 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Mobile Fixes | 0/TBD | Not started | - |
+| 1. Mobile Fixes | 0/3 | Planned | - |
 | 2. Playwright Tests | 0/TBD | Not started | - |
