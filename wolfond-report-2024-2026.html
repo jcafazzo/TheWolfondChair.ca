@@ -76,27 +76,29 @@ body { animation: bodyIn 1s ease forwards; }
 .topbar {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 1.5rem 2.5rem; mix-blend-mode: difference;
+  padding: 1.5rem 2.5rem;
+  transition: color 0.5s ease;
 }
 .topbar-logo {
   font-family: var(--serif); font-size: 0.95rem; font-weight: 600;
   color: var(--white); text-decoration: none; letter-spacing: -0.01em; cursor: pointer;
+  transition: color 0.5s ease;
 }
 .topbar-domain {
   font-family: var(--sans); font-size: 0.7rem; font-weight: 400;
   color: var(--white); opacity: 0.5; letter-spacing: 0.06em; text-transform: uppercase;
+  transition: color 0.5s ease;
 }
 
 /* ═══ Nav dots ═══ */
 .slide-nav {
   position: fixed; right: 2.5rem; top: 50%; transform: translateY(-50%);
   z-index: 100; display: flex; flex-direction: column; gap: 0.6rem;
-  mix-blend-mode: difference;
 }
 .slide-dot {
   width: 8px; height: 8px; border-radius: 50%;
   background: rgba(255,255,255,0.25); cursor: pointer;
-  transition: all 0.4s ease; border: none; padding: 0;
+  transition: all 0.5s ease; border: none; padding: 0;
   position: relative;
   -webkit-tap-highlight-color: transparent;
 }
@@ -114,14 +116,14 @@ body { animation: bodyIn 1s ease forwards; }
 
 .slide-arrows {
   position: fixed; bottom: 2.5rem; right: 2.5rem; z-index: 100;
-  display: flex; gap: 0.5rem; mix-blend-mode: difference;
+  display: flex; gap: 0.5rem;
 }
 .slide-arrow {
   width: 48px; height: 48px; border-radius: 50%;
   border: 1px solid rgba(255,255,255,0.3); background: transparent;
   color: var(--white); cursor: pointer; font-size: 1.1rem;
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   -webkit-tap-highlight-color: transparent;
 }
 .slide-arrow:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.6); }
@@ -129,7 +131,8 @@ body { animation: bodyIn 1s ease forwards; }
 .slide-counter {
   position: fixed; bottom: 2.75rem; left: 2.5rem; z-index: 100;
   font-family: var(--sans); font-size: 0.75rem; font-weight: 400;
-  color: var(--white); mix-blend-mode: difference; letter-spacing: 0.08em;
+  color: var(--white); letter-spacing: 0.08em;
+  transition: color 0.5s ease;
 }
 
 @media (max-width: 768px) {
@@ -138,6 +141,19 @@ body { animation: bodyIn 1s ease forwards; }
   .slide-arrows { right: 1.5rem; bottom: 1.5rem; }
   .slide-counter { left: 1.5rem; bottom: 1.75rem; }
 }
+
+/* ═══ Nav theme: light slides ═══ */
+body[data-nav-theme="light"] .topbar-logo { color: var(--black); }
+body[data-nav-theme="light"] .topbar-domain { color: var(--black); }
+body[data-nav-theme="light"] .slide-dot { background: rgba(0,0,0,0.2); }
+body[data-nav-theme="light"] .slide-dot.active { background: var(--black); }
+body[data-nav-theme="light"] .slide-dot:hover { background: rgba(0,0,0,0.5); }
+body[data-nav-theme="light"] .slide-arrow { color: var(--black); border-color: rgba(0,0,0,0.25); }
+body[data-nav-theme="light"] .slide-arrow:hover { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.5); }
+body[data-nav-theme="light"] .slide-counter { color: var(--black); }
+body[data-nav-theme="light"] .auto-counter { color: var(--black); }
+body[data-nav-theme="light"] .progress-bar { background: rgba(0,0,0,0.06); }
+body[data-nav-theme="light"] .progress-fill { background: var(--black); }
 
 /* ═══ Typography ═══ */
 .t-display {
@@ -381,19 +397,21 @@ a.pub-row:hover { opacity: 0.6; }
 .progress-bar {
   position: fixed; bottom: 0; left: 0; right: 0; height: 2px;
   background: rgba(255,255,255,0.06); z-index: 100;
+  transition: background 0.5s ease;
 }
 .progress-fill {
   height: 100%; width: 0%; background: var(--white);
-  mix-blend-mode: difference; transition: width 0.6s ease;
+  transition: width 0.6s ease, background 0.5s ease;
 }
 
 /* ═══ Auto-advance counter ═══ */
 .auto-counter {
   position: fixed; bottom: 2.95rem; right: 10rem; z-index: 99;
   font-family: var(--sans); font-size: 0.6rem; font-weight: 400;
-  color: var(--white); mix-blend-mode: difference;
+  color: var(--white);
   letter-spacing: 0.06em; opacity: 0.4;
   font-variant-numeric: tabular-nums;
+  transition: color 0.5s ease;
 }
 
 /* ═══ Video Modal ═══ */
@@ -1204,10 +1222,19 @@ function init() {
   ).join('');
 
   slides[0].classList.add('active');
+  applyNavTheme(slides[0]);
   updateCounter();
   buildPubList();
   setupConvoAutoplay();
   startAutoAdvance();
+}
+
+function getSlideTheme(slideEl) {
+  const cl = slideEl.classList;
+  return (cl.contains('dark-slide') || cl.contains('cover') || cl.contains('full-image')) ? 'dark' : 'light';
+}
+function applyNavTheme(slideEl) {
+  document.body.setAttribute('data-nav-theme', getSlideTheme(slideEl));
 }
 
 function goToSlide(index) {
@@ -1221,6 +1248,7 @@ function goToSlide(index) {
   setTimeout(() => { prev.classList.remove('exiting'); isTransitioning = false; }, 800);
   current = index;
   document.querySelectorAll('.slide-dot').forEach((d, i) => d.classList.toggle('active', i === current));
+  applyNavTheme(slides[current]);
   updateCounter();
   // Autoplay Media videos on the Media slide (index 12)
   const cdtxFrame = document.getElementById('mediaCdtxFrame');
@@ -1275,60 +1303,21 @@ function updateCounter() {
   document.getElementById('progressFill').style.width = pct + '%';
 }
 
-// Keyboard
+// Keyboard — arrow keys only
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextSlide(); }
-  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
 });
 
-// Touch — let scrollable content scroll, swipe left/right to advance
-let touchStartY = 0, touchStartX = 0, touchScrollEl = null;
-document.addEventListener('touchstart', (e) => {
-  touchStartY = e.touches[0].clientY; touchStartX = e.touches[0].clientX;
-  touchScrollEl = e.target.closest('.scroll-content');
-}, { passive: true });
-document.addEventListener('touchend', (e) => {
-  const dy = touchStartY - e.changedTouches[0].clientY;
-  const dx = touchStartX - e.changedTouches[0].clientX;
-  // Horizontal swipe always advances (left/right)
-  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
-    if (dx > 0) nextSlide(); else prevSlide();
-    return;
-  }
-  // Vertical swipe — only advance if no scrollable content on this slide
-  if (Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx)) {
-    if (touchScrollEl && touchScrollEl.scrollHeight > touchScrollEl.clientHeight + 4) return;
-    if (dy > 0) nextSlide(); else prevSlide();
-  }
+// Tap-to-navigate — tap right side to advance, left side to go back
+document.addEventListener('click', (e) => {
+  // Ignore clicks on interactive elements
+  if (e.target.closest('a, button, input, select, textarea, iframe, .convo-thumb, .scroll-content, .slide-arrow, .slide-dot, .slide-nav, .topbar, .video-modal, .pub-filter, .video-mute-btn, .tl-feature')) return;
+  const x = e.clientX;
+  const w = window.innerWidth;
+  if (x > w / 2) nextSlide();
+  else prevSlide();
 });
-
-// Mouse wheel — only advance slides when NOT inside scrollable content
-let wheelTimeout = null;
-let edgeScrollCount = 0;
-document.addEventListener('wheel', (e) => {
-  // Check if the current slide has scrollable content
-  const scrollEl = e.target.closest('.scroll-content') || slides[current].querySelector('.scroll-content');
-  if (scrollEl && scrollEl.scrollHeight > scrollEl.clientHeight + 4) {
-    // Content is scrollable — let it scroll freely
-    const atTop = scrollEl.scrollTop <= 1;
-    const atBottom = scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 4;
-    const goingUp = e.deltaY < 0;
-    const goingDown = e.deltaY > 0;
-    // Only consider advancing after user has scrolled past edge multiple times
-    if ((goingUp && atTop) || (goingDown && atBottom)) {
-      edgeScrollCount++;
-      if (edgeScrollCount < 3) return; // require 3 edge scrolls before advancing
-      edgeScrollCount = 0;
-    } else {
-      edgeScrollCount = 0;
-      return; // let the content scroll normally
-    }
-  }
-  e.preventDefault();
-  if (wheelTimeout) return;
-  wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
-  if (e.deltaY > 0) nextSlide(); else prevSlide();
-}, { passive: false });
 
 // ═══ PUB LIST ═══
 function buildPubList() {
