@@ -14,9 +14,9 @@
 
 ### Mobile JS
 
-- [ ] **MJS-01**: Swipe detection requires horizontal delta to exceed vertical delta and minimum 40px threshold before triggering slide change
-- [ ] **MJS-02**: Touch target detection checks if finger landed inside `.scroll-content` element before suppressing vertical swipe
-- [ ] **MJS-03**: Auto-advance timer pauses when browser tab is hidden (Page Visibility API) and resumes when visible
+- [x] **MJS-01**: Swipe detection requires horizontal delta to exceed vertical delta and minimum 40px threshold before triggering slide change
+- [x] **MJS-02**: Touch target detection checks if finger landed inside `.scroll-content` element before suppressing vertical swipe
+- [x] **MJS-03**: Auto-advance timer pauses when browser tab is hidden (Page Visibility API) and resumes when visible
 
 ### E2E Testing
 
@@ -60,9 +60,9 @@
 | MCSS-02 | Phase 1 | Complete |
 | MCSS-03 | Phase 1 | Complete |
 | MCSS-04 | Phase 1 | Complete |
-| MJS-01 | Phase 1 | Pending |
-| MJS-02 | Phase 1 | Pending |
-| MJS-03 | Phase 1 | Pending |
+| MJS-01 | Phase 1 | Complete |
+| MJS-02 | Phase 1 | Complete |
+| MJS-03 | Phase 1 | Complete |
 | TEST-01 | Phase 2 | Pending |
 | TEST-02 | Phase 2 | Pending |
 | TEST-03 | Phase 2 | Pending |

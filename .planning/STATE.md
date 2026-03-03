@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 1 of 2 (Mobile Fixes)
-Plan: 1 of TBD in current phase (01-01 complete)
+Plan: 2 of TBD in current phase (01-02 complete)
 Status: In progress
-Last activity: 2026-03-02 — Plan 01-01 complete (CSS mobile fixes)
+Last activity: 2026-03-03 — Plan 01-02 complete (JS touch handler + Page Visibility API fixes)
 
-Progress: [█░░░░░░░░░] 10%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: ~2 min
-- Total execution time: ~2 min
+- Total plans completed: 2
+- Average duration: ~3.5 min
+- Total execution time: ~7 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-mobile-fixes | 1 | ~2 min | ~2 min |
+| 01-mobile-fixes | 2 | ~7 min | ~3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2 min)
+- Last 5 plans: 01-01 (2 min), 01-02 (5 min)
 - Trend: -
 
 *Updated after each plan completion*
@@ -46,6 +46,8 @@ Recent decisions affecting current work:
 - [Phase 1]: Use `100svh` with `100vh` fallback (not `100dvh`) for layout stability — dvh causes visible resize jitter on address bar show/hide; must be decided explicitly before writing CSS
 - [Phase 1]: Use `touch-action: pan-y` (CSS-level) as primary swipe discrimination mechanism; avoid `preventDefault` on passive listeners
 - [Phase 1]: On `touchstart`, record `e.target.closest('.scroll-content')` and use stored reference in `touchend` — fixes scroll area detection bug
+- [Phase 1, Plan 02]: Resume auto-advance from `secondsLeft` (remaining time), not `AUTO_SECONDS` — user explicitly decided this; avoids full-reset on tab return
+- [Phase 1, Plan 02]: `autoTimerPaused` flag distinguishes system-pause (tab hidden) from other stop reasons — prevents accidental resume after explicit user stop
 
 ### Pending Todos
 
@@ -59,5 +61,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 01-01-PLAN.md (CSS mobile fixes — viewport, touch-action, overscroll, nav dot hit targets)
+Stopped at: Completed 01-02-PLAN.md (JS touch handler fix + Page Visibility API timer pause/resume)
 Resume file: None

@@ -12,7 +12,7 @@ Two phases derived directly from the work: first fix the broken mobile behavior 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Mobile Fixes** - Apply all CSS and JS corrections that make mobile navigation, scrolling, and touch interaction work correctly
+- [ ] **Phase 1: Mobile Fixes** - Apply all CSS and JS corrections that make mobile navigation, scrolling, and touch interaction work correctly (2/3 plans complete)
 - [ ] **Phase 2: Playwright Tests** - Build the E2E test suite that asserts the fixed behavior and guards against desktop regression
 
 ## Phase Details
@@ -28,8 +28,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Swiping horizontally on any slide changes the slide; swiping vertically on a scrollable slide scrolls the content
   5. The auto-advance timer pauses when the user switches to another tab and resumes when they return
 **Plans**: 3 plans
-- [ ] 01-01-PLAN.md — CSS mobile fixes: viewport units, touch-action, overscroll-behavior, dot touch targets
-- [ ] 01-02-PLAN.md — JS mobile fixes: touch handler bug fix, Page Visibility API timer pause/resume
+- [x] 01-01-PLAN.md — CSS mobile fixes: viewport units, touch-action, overscroll-behavior, dot touch targets
+- [x] 01-02-PLAN.md — JS mobile fixes: touch handler bug fix, Page Visibility API timer pause/resume
 - [ ] 01-03-PLAN.md — Mobile verification checkpoint: real device testing of all fixes
 
 ### Phase 2: Playwright Tests
@@ -51,5 +51,5 @@ Phases execute in numeric order: 1 → 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Mobile Fixes | 0/3 | Planned | - |
+| 1. Mobile Fixes | 2/3 | In progress | - |
 | 2. Playwright Tests | 0/TBD | Not started | - |
