@@ -1114,6 +1114,7 @@ let autoTimer = null;
 let countdownTimer = null;
 let secondsLeft = 120;
 const AUTO_SECONDS = 120; // 2 minutes
+let autoTimerPaused = false;
 
 function updateCounterDisplay() {
   const el = document.getElementById('autoCounter');
@@ -1150,6 +1151,41 @@ function stopAutoAdvance() {
 function resetAutoAdvance() {
   startAutoAdvance();
 }
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    // Tab hidden — pause both intervals if running
+    if (autoTimer !== null || countdownTimer !== null) {
+      stopAutoAdvance();
+      autoTimerPaused = true;
+    }
+  } else if (autoTimerPaused) {
+    // Tab visible again — resume from remaining seconds
+    autoTimerPaused = false;
+    if (secondsLeft <= 0) {
+      // Tab was hidden longer than timer duration — restart fresh
+      startAutoAdvance();
+    } else {
+      // Resume countdown display from where it left off
+      updateCounterDisplay();
+      countdownTimer = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft < 0) secondsLeft = 0;
+        updateCounterDisplay();
+      }, 1000);
+      // Fire slide advance after remaining seconds
+      autoTimer = setInterval(() => {
+        if (document.getElementById('videoModal').classList.contains('open')) return;
+        if (current < slides.length - 1) {
+          goToSlide(current + 1);
+        } else {
+          goToSlide(0);
+        }
+        // goToSlide() calls resetAutoAdvance() internally, which restarts fresh
+      }, secondsLeft * 1000);
+    }
+  }
+});
 
 // ═══ ENGINE ═══
 let current = 0;
