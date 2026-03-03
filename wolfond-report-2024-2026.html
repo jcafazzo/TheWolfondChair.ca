@@ -1319,6 +1319,22 @@ document.addEventListener('click', (e) => {
   else prevSlide();
 });
 
+// Swipe-to-navigate — horizontal swipe advances/retreats; vertical scroll unaffected
+let swipeStartX = 0;
+let swipeStartY = 0;
+document.addEventListener('touchstart', (e) => {
+  swipeStartX = e.changedTouches[0].clientX;
+  swipeStartY = e.changedTouches[0].clientY;
+}, { passive: true });
+document.addEventListener('touchend', (e) => {
+  const dx = e.changedTouches[0].clientX - swipeStartX;
+  const dy = e.changedTouches[0].clientY - swipeStartY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+    if (dx < 0) nextSlide();
+    else prevSlide();
+  }
+}, { passive: true });
+
 // ═══ PUB LIST ═══
 function buildPubList() {
   const list = document.getElementById('pubList');
