@@ -31,13 +31,14 @@ body {
   background: var(--white);
   line-height: 1.6;
   overflow: hidden;
-  height: 100dvh;
+  height: 100vh;
+  height: 100svh;
 }
 
 a { color: var(--black); }
 
 /* ═══ Slide deck ═══ */
-.deck { height: 100dvh; overflow: hidden; position: relative; }
+.deck { height: 100vh; height: 100svh; overflow: hidden; position: relative; }
 
 .slide {
   position: absolute; inset: 0;
@@ -45,6 +46,9 @@ a { color: var(--black); }
   opacity: 0; transform: translateY(40px);
   transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none; overflow-y: auto; overflow-x: hidden;
+  touch-action: pan-y;
+  overscroll-behavior-x: contain;
+  -webkit-tap-highlight-color: transparent;
 }
 .slide.active { opacity: 1; transform: translateY(0); pointer-events: auto; z-index: 2; }
 .slide.exiting { opacity: 0; transform: translateY(-30px); pointer-events: none; z-index: 1; }
@@ -62,7 +66,7 @@ body { animation: bodyIn 1s ease forwards; }
 @keyframes bodyIn { from { opacity: 0; } to { opacity: 1; } }
 
 .slide-inner {
-  width: 100%; min-height: 100dvh;
+  width: 100%; min-height: 100vh; min-height: 100svh;
   display: flex; align-items: center; justify-content: center;
   padding: 5rem 4rem;
 }
