@@ -56,24 +56,24 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MCSS-01 | — | Pending |
-| MCSS-02 | — | Pending |
-| MCSS-03 | — | Pending |
-| MCSS-04 | — | Pending |
-| MJS-01 | — | Pending |
-| MJS-02 | — | Pending |
-| MJS-03 | — | Pending |
-| TEST-01 | — | Pending |
-| TEST-02 | — | Pending |
-| TEST-03 | — | Pending |
-| TEST-04 | — | Pending |
-| TEST-05 | — | Pending |
+| MCSS-01 | Phase 1 | Pending |
+| MCSS-02 | Phase 1 | Pending |
+| MCSS-03 | Phase 1 | Pending |
+| MCSS-04 | Phase 1 | Pending |
+| MJS-01 | Phase 1 | Pending |
+| MJS-02 | Phase 1 | Pending |
+| MJS-03 | Phase 1 | Pending |
+| TEST-01 | Phase 2 | Pending |
+| TEST-02 | Phase 2 | Pending |
+| TEST-03 | Phase 2 | Pending |
+| TEST-04 | Phase 2 | Pending |
+| TEST-05 | Phase 2 | Pending |
 
 **Coverage:**
 - v1 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12 (pending roadmap)
+- Mapped to phases: 12
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-02*
-*Last updated: 2026-03-02 after initial definition*
+*Last updated: 2026-03-02 after roadmap creation*
