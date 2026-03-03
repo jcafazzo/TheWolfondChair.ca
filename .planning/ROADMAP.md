@@ -45,7 +45,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 - [x] 02-01-PLAN.md — Project scaffolding: npm init, Playwright install, config, .gitignore
 - [ ] 02-02-PLAN.md — Navigation + desktop regression tests: keyboard, dot, arrow nav, desktop layout
-- [ ] 02-03-PLAN.md — Mobile viewport + video modal tests: device emulation CSS, modal lifecycle
+- [x] 02-03-PLAN.md — Mobile viewport + video modal tests: device emulation CSS, modal lifecycle
 
 ## Progress
 
@@ -55,4 +55,4 @@ Phases execute in numeric order: 1 → 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Mobile Fixes | 3/3 | Complete | 2026-03-02 |
-| 2. Playwright Tests | 1/3 | In progress | - |
+| 2. Playwright Tests | 2/3 | In progress | - |

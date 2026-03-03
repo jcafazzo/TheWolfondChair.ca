@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-03-02)
 ## Current Position
 
 Phase: 2 of 2 (Playwright Tests)
-Plan: 1 of 5 in current phase (02-01 complete — Playwright project initialized)
+Plan: 3 of 5 in current phase (02-03 complete — mobile-viewport.spec.ts + video-modal.spec.ts)
 Status: Phase 2 in progress
-Last activity: 2026-03-02 — Plan 02-01 complete (Playwright npm init, config, browser binaries)
+Last activity: 2026-03-03 — Plan 02-03 complete (TEST-03 mobile viewport + TEST-04 video modal specs)
 
-Progress: [████░░░░░░] 50%
+Progress: [████████░░] 70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: ~7 min
-- Total execution time: ~24 min
+- Total plans completed: 5
+- Average duration: ~5 min
+- Total execution time: ~26 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-mobile-fixes | 3 | ~22 min | ~7 min |
-| 02-playwright-tests | 1 | ~2 min | ~2 min |
+| 02-playwright-tests | 3 | ~6 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2 min), 01-02 (5 min), 01-03 (15 min), 02-01 (2 min)
+- Last 5 plans: 01-01 (2 min), 01-02 (5 min), 01-03 (15 min), 02-01 (2 min), 02-03 (2 min)
 - Trend: -
 
 *Updated after each plan completion*
@@ -51,6 +51,7 @@ Recent decisions affecting current work:
 - [Phase 1, Plan 02]: `autoTimerPaused` flag distinguishes system-pause (tab hidden) from other stop reasons — prevents accidental resume after explicit user stop
 - [Phase 1, Plan 03]: `align-items: center` on `.slide` causes overflow content to be hidden behind fixed topbar — use `flex-start`; inner variants (deep-slide, grid-slide, letter-slide) handle their own alignment
 - [Phase 2, Plan 01]: python3 http.server as static server (no npm dev server); workers=1; retries=0; device projects use Playwright registry objects without viewport override
+- [Phase 2, Plan 03]: CONVO_SLIDE_INDEX is a JS const, not exposed on window — use literal 13 in page.evaluate(); toHaveClass() takes regex /open/ not exact string for multi-class elements
 
 ### Pending Todos
 
@@ -63,6 +64,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-02
-Stopped at: Completed 02-01-PLAN.md (Playwright project initialization — package.json, playwright.config.ts, browser binaries)
+Last session: 2026-03-03
+Stopped at: Completed 02-03-PLAN.md (mobile-viewport.spec.ts + video-modal.spec.ts — TEST-03 + TEST-04)
 Resume file: None
