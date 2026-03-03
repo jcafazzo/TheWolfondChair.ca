@@ -7,10 +7,10 @@
 
 ### Mobile CSS
 
-- [ ] **MCSS-01**: Slides use viewport height fallback (`100vh` before `100dvh`/`100svh`) for consistent height across all mobile browsers
-- [ ] **MCSS-02**: Slides have `touch-action: pan-y` to allow native vertical scrolling while enabling horizontal swipe navigation
-- [ ] **MCSS-03**: All interactive elements (nav dots, arrows, buttons) have minimum 44px touch targets
-- [ ] **MCSS-04**: Slides use `overscroll-behavior-x: contain` to prevent accidental browser back/forward on horizontal swipe
+- [x] **MCSS-01**: Slides use viewport height fallback (`100vh` before `100dvh`/`100svh`) for consistent height across all mobile browsers
+- [x] **MCSS-02**: Slides have `touch-action: pan-y` to allow native vertical scrolling while enabling horizontal swipe navigation
+- [x] **MCSS-03**: All interactive elements (nav dots, arrows, buttons) have minimum 44px touch targets
+- [x] **MCSS-04**: Slides use `overscroll-behavior-x: contain` to prevent accidental browser back/forward on horizontal swipe
 
 ### Mobile JS
 
@@ -56,10 +56,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MCSS-01 | Phase 1 | Pending |
-| MCSS-02 | Phase 1 | Pending |
-| MCSS-03 | Phase 1 | Pending |
-| MCSS-04 | Phase 1 | Pending |
+| MCSS-01 | Phase 1 | Complete |
+| MCSS-02 | Phase 1 | Complete |
+| MCSS-03 | Phase 1 | Complete |
+| MCSS-04 | Phase 1 | Complete |
 | MJS-01 | Phase 1 | Pending |
 | MJS-02 | Phase 1 | Pending |
 | MJS-03 | Phase 1 | Pending |
