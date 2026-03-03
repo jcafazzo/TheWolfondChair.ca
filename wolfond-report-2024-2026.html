@@ -899,8 +899,8 @@ function buildSlides() {
           <div class="media-row"><a href="https://www.oha.com/news/scaling-from-within-medly%E2%80%99s-digital-health-journey" target="_blank"><span class="media-title">Scaling From Within: Medly&rsquo;s Digital Health Journey</span><span class="media-source">OHA</span></a></div>
           <div style="margin-top: 2.5rem;">
             <div class="video-pair">
-              <div style="position: relative;"><div class="video-wrap" style="position: relative;"><iframe id="mediaCdtxFrame" src="" title="CDTx Overview" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe><button class="video-mute-btn" data-target="mediaCdtxFrame" data-muted="true" onclick="toggleVideoMute(this)" style="position:absolute;bottom:12px;right:12px;z-index:10;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.6);color:white;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:all 0.2s;">&#128263;</button></div><div class="video-label">Centre for Digital Therapeutics</div></div>
-              <div style="position: relative;"><div class="video-wrap" style="position: relative;"><iframe id="mediaChinFrame" src="" title="CHIN Radio Interview" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe><button class="video-mute-btn" data-target="mediaChinFrame" data-muted="true" onclick="toggleVideoMute(this)" style="position:absolute;bottom:12px;right:12px;z-index:10;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.6);color:white;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:all 0.2s;">&#128263;</button></div><div class="video-label">Stella Kozusco, CHIN Radio Interview</div></div>
+              <div style="position: relative;"><div class="video-wrap" style="position: relative;"><iframe id="mediaCdtxFrame" src="" title="CDTx Overview" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe><button class="video-mute-btn" data-target="mediaCdtxFrame" data-muted="true" onclick="toggleVideoMute(this)" style="position:absolute;bottom:12px;right:12px;z-index:10;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.6);color:white;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:all 0.2s;">&#128263;</button></div><div class="video-label">Medly in Uganda</div></div>
+              <div style="position: relative;"><div class="video-wrap" style="position: relative;"><iframe id="mediaChinFrame" src="" title="CHIN Radio Interview" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe><button class="video-mute-btn" data-target="mediaChinFrame" data-muted="true" onclick="toggleVideoMute(this)" style="position:absolute;bottom:12px;right:12px;z-index:10;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.6);color:white;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:all 0.2s;">&#128263;</button></div><div class="video-label">Stella Kozusco, Medly NP on CHIN Radio</div></div>
             </div>
           </div>
         </div>
@@ -1044,7 +1044,7 @@ function openVideoModal(vimeoId, caption) {
   const modal = document.getElementById('videoModal');
   const frame = document.getElementById('videoModalFrame');
   const cap = document.getElementById('videoModalCaption');
-  frame.src = 'https://player.vimeo.com/video/' + vimeoId + '?autoplay=1&title=0&byline=0&portrait=0';
+  frame.src = 'https://player.vimeo.com/video/' + vimeoId + '?autoplay=1&title=0&byline=0&portrait=0&badge=0&pip=0&vimeo_logo=0&dnt=1';
   cap.textContent = caption || 'Voices from the Centre';
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1088,7 +1088,7 @@ function startConvoAutoplay() {
   const vid = CONVO_VIDEOS[convoPickIndex];
   const iframe = document.createElement('iframe');
   iframe.className = 'convo-inline-video';
-  iframe.src = 'https://player.vimeo.com/video/' + vid.id + '?background=1&autoplay=1&muted=1&loop=1';
+  iframe.src = 'https://player.vimeo.com/video/' + vid.id + '?background=1&autoplay=1&muted=1&loop=1&badge=0&pip=0&vimeo_logo=0&dnt=1';
   iframe.allow = 'autoplay';
   iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;z-index:1;pointer-events:none;border-radius:8px;';
   // Hide the static image behind the video
@@ -1255,14 +1255,14 @@ function goToSlide(index) {
   const chinFrame = document.getElementById('mediaChinFrame');
   if (cdtxFrame) {
     if (index === 12) {
-      cdtxFrame.src = 'https://player.vimeo.com/video/1169720277?background=1&autoplay=1&muted=1&loop=1';
+      cdtxFrame.src = 'https://player.vimeo.com/video/1169720277?background=1&autoplay=1&muted=1&loop=1&badge=0&pip=0&vimeo_logo=0&dnt=1';
     } else {
       cdtxFrame.src = '';
     }
   }
   if (chinFrame) {
     if (index === 12) {
-      chinFrame.src = 'https://player.vimeo.com/video/1169720780?background=1&autoplay=1&muted=1&loop=1&texttrack=en';
+      chinFrame.src = 'https://player.vimeo.com/video/1169720780?background=1&autoplay=1&muted=1&loop=1&texttrack=en&badge=0&pip=0&vimeo_logo=0&dnt=1';
     } else {
       chinFrame.src = '';
     }
@@ -1279,7 +1279,7 @@ function goToSlide(index) {
   const gregFrame = document.getElementById('gregAutoplayFrame');
   if (gregFrame) {
     if (index === slides.length - 1) {
-      gregFrame.src = 'https://player.vimeo.com/video/1169716954?background=1&autoplay=1&muted=1&loop=1';
+      gregFrame.src = 'https://player.vimeo.com/video/1169716954?background=1&autoplay=1&muted=1&loop=1&badge=0&pip=0&vimeo_logo=0&dnt=1';
     } else {
       gregFrame.src = '';
     }
