@@ -89,16 +89,16 @@ test.describe('Navigation', () => {
     await expect(page.locator('#slideCounter')).toHaveText(counterText(1, total));
   });
 
-  test('boundary: cannot go past last slide', async ({ page }) => {
+  test('boundary: advancing past last slide wraps to first', async ({ page }) => {
     const total = await getTotalSlides(page);
     // Navigate to last slide directly via global function
     await page.evaluate((idx: number) => (window as any).goToSlide(idx), total - 1);
     await page.waitForTimeout(850);
-    // Try to go past last slide
+    // Advance past last slide — should wrap to first
     await page.keyboard.press('ArrowRight');
-    await page.waitForTimeout(850);
+    await expect(page.locator('#slideCounter')).toHaveText(counterText(1, total));
     const current = await getCurrentSlideIndex(page);
-    expect(current).toBe(total - 1);
+    expect(current).toBe(0);
   });
 
   test('tap right side of screen advances slide', async ({ page }) => {
