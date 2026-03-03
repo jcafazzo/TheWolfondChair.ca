@@ -20,7 +20,7 @@
 
 ### E2E Testing
 
-- [ ] **TEST-01**: Playwright project configured with webServer serving static HTML, running on desktop Chromium
+- [x] **TEST-01**: Playwright project configured with webServer serving static HTML, running on desktop Chromium
 - [ ] **TEST-02**: Navigation tests verify keyboard arrows, click dots, and click arrows advance/retreat slides correctly
 - [ ] **TEST-03**: Mobile viewport tests verify layout on iPhone 14 and Pixel 5 device emulation
 - [ ] **TEST-04**: Video modal tests verify open, close, and Escape key dismissal
@@ -63,7 +63,7 @@
 | MJS-01 | Phase 1 | Complete |
 | MJS-02 | Phase 1 | Complete |
 | MJS-03 | Phase 1 | Complete |
-| TEST-01 | Phase 2 | Pending |
+| TEST-01 | Phase 2 | Complete |
 | TEST-02 | Phase 2 | Pending |
 | TEST-03 | Phase 2 | Pending |
 | TEST-04 | Phase 2 | Pending |

@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** The presentation must work smoothly on mobile devices without breaking the existing desktop experience
-**Current focus:** Phase 1 — Mobile Fixes
+**Current focus:** Phase 2 — Playwright Tests
 
 ## Current Position
 
-Phase: 1 of 2 (Mobile Fixes)
-Plan: 3 of 3 in current phase (01-03 complete — phase complete)
-Status: Phase 1 complete
-Last activity: 2026-03-02 — Plan 01-03 complete (mobile device verification — all 5 criteria passed)
+Phase: 2 of 2 (Playwright Tests)
+Plan: 1 of 5 in current phase (02-01 complete — Playwright project initialized)
+Status: Phase 2 in progress
+Last activity: 2026-03-02 — Plan 02-01 complete (Playwright npm init, config, browser binaries)
 
-Progress: [████░░░░░░] 40%
+Progress: [████░░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: ~8 min
-- Total execution time: ~22 min
+- Total plans completed: 4
+- Average duration: ~7 min
+- Total execution time: ~24 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-mobile-fixes | 3 | ~22 min | ~7 min |
+| 02-playwright-tests | 1 | ~2 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2 min), 01-02 (5 min), 01-03 (15 min)
+- Last 5 plans: 01-01 (2 min), 01-02 (5 min), 01-03 (15 min), 02-01 (2 min)
 - Trend: -
 
 *Updated after each plan completion*
@@ -49,6 +50,7 @@ Recent decisions affecting current work:
 - [Phase 1, Plan 02]: Resume auto-advance from `secondsLeft` (remaining time), not `AUTO_SECONDS` — user explicitly decided this; avoids full-reset on tab return
 - [Phase 1, Plan 02]: `autoTimerPaused` flag distinguishes system-pause (tab hidden) from other stop reasons — prevents accidental resume after explicit user stop
 - [Phase 1, Plan 03]: `align-items: center` on `.slide` causes overflow content to be hidden behind fixed topbar — use `flex-start`; inner variants (deep-slide, grid-slide, letter-slide) handle their own alignment
+- [Phase 2, Plan 01]: python3 http.server as static server (no npm dev server); workers=1; retries=0; device projects use Playwright registry objects without viewport override
 
 ### Pending Todos
 
@@ -62,5 +64,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 01-03-PLAN.md (mobile device verification — Phase 1 complete)
+Stopped at: Completed 02-01-PLAN.md (Playwright project initialization — package.json, playwright.config.ts, browser binaries)
 Resume file: None

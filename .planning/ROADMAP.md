@@ -12,7 +12,7 @@ Two phases derived directly from the work: first fix the broken mobile behavior 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Mobile Fixes** - Apply all CSS and JS corrections that make mobile navigation, scrolling, and touch interaction work correctly (2/3 plans complete)
+- [x] **Phase 1: Mobile Fixes** - Apply all CSS and JS corrections that make mobile navigation, scrolling, and touch interaction work correctly (3/3 plans complete)
 - [ ] **Phase 2: Playwright Tests** - Build the E2E test suite that asserts the fixed behavior and guards against desktop regression
 
 ## Phase Details
@@ -30,7 +30,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 - [x] 01-01-PLAN.md — CSS mobile fixes: viewport units, touch-action, overscroll-behavior, dot touch targets
 - [x] 01-02-PLAN.md — JS mobile fixes: touch handler bug fix, Page Visibility API timer pause/resume
-- [ ] 01-03-PLAN.md — Mobile verification checkpoint: real device testing of all fixes
+- [x] 01-03-PLAN.md — Mobile verification checkpoint: real device testing of all fixes
 
 ### Phase 2: Playwright Tests
 **Goal**: Automated E2E tests cover all navigation patterns and mobile viewport behavior, and confirm the desktop experience is unchanged
@@ -43,7 +43,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Video modal tests confirm the modal opens, closes via button, and closes via Escape key
   5. Desktop regression tests pass, confirming all navigation and layout still work after the Phase 1 mobile changes
 **Plans**: 3 plans
-- [ ] 02-01-PLAN.md — Project scaffolding: npm init, Playwright install, config, .gitignore
+- [x] 02-01-PLAN.md — Project scaffolding: npm init, Playwright install, config, .gitignore
 - [ ] 02-02-PLAN.md — Navigation + desktop regression tests: keyboard, dot, arrow nav, desktop layout
 - [ ] 02-03-PLAN.md — Mobile viewport + video modal tests: device emulation CSS, modal lifecycle
 
@@ -54,5 +54,5 @@ Phases execute in numeric order: 1 → 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Mobile Fixes | 2/3 | In progress | - |
-| 2. Playwright Tests | 0/3 | Not started | - |
+| 1. Mobile Fixes | 3/3 | Complete | 2026-03-02 |
+| 2. Playwright Tests | 1/3 | In progress | - |
