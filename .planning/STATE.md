@@ -51,6 +51,9 @@ Recent decisions affecting current work:
 - [Phase 1, Plan 02]: `autoTimerPaused` flag distinguishes system-pause (tab hidden) from other stop reasons — prevents accidental resume after explicit user stop
 - [Phase 1, Plan 03]: `align-items: center` on `.slide` causes overflow content to be hidden behind fixed topbar — use `flex-start`; inner variants (deep-slide, grid-slide, letter-slide) handle their own alignment
 - [Phase 2, Plan 01]: python3 http.server as static server (no npm dev server); workers=1; retries=0; device projects use Playwright registry objects without viewport override
+- [Phase 2, Plan 02]: `slides` is a let-scoped variable, not on window — use document.querySelectorAll('.slide').length for runtime slide count; goToSlide/nextSlide/prevSlide ARE on window (function declarations)
+- [Phase 2, Plan 02]: Dot clicks require dispatchEvent workaround — 44px ::before touch targets overlap adjacent dots; pointer-events intercept prevents direct locator.click() and force:true clicks wrong element
+- [Phase 2, Plan 02]: 850ms wait required between sequential navigations to clear 800ms isTransitioning guard — counter-text assertion confirms slide changed but does not wait for isTransitioning to clear
 - [Phase 2, Plan 03]: CONVO_SLIDE_INDEX is a JS const, not exposed on window — use literal 13 in page.evaluate(); toHaveClass() takes regex /open/ not exact string for multi-class elements
 
 ### Pending Todos
@@ -65,5 +68,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Completed 02-03-PLAN.md (mobile-viewport.spec.ts + video-modal.spec.ts — TEST-03 + TEST-04)
+Stopped at: Completed 02-02-PLAN.md (navigation.spec.ts + desktop-regression.spec.ts — TEST-02 + TEST-05)
 Resume file: None

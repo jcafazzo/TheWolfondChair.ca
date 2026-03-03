@@ -21,10 +21,10 @@
 ### E2E Testing
 
 - [x] **TEST-01**: Playwright project configured with webServer serving static HTML, running on desktop Chromium
-- [ ] **TEST-02**: Navigation tests verify keyboard arrows, click dots, and click arrows advance/retreat slides correctly
+- [x] **TEST-02**: Navigation tests verify keyboard arrows, click dots, and click arrows advance/retreat slides correctly
 - [x] **TEST-03**: Mobile viewport tests verify layout on iPhone 14 and Pixel 5 device emulation
 - [x] **TEST-04**: Video modal tests verify open, close, and Escape key dismissal
-- [ ] **TEST-05**: Desktop regression tests confirm all navigation and layout still works after mobile changes
+- [x] **TEST-05**: Desktop regression tests confirm all navigation and layout still works after mobile changes
 
 ## v2 Requirements
 
@@ -64,10 +64,10 @@
 | MJS-02 | Phase 1 | Complete |
 | MJS-03 | Phase 1 | Complete |
 | TEST-01 | Phase 2 | Complete |
-| TEST-02 | Phase 2 | Pending |
+| TEST-02 | Phase 2 | Complete |
 | TEST-03 | Phase 2 | Complete |
 | TEST-04 | Phase 2 | Complete |
-| TEST-05 | Phase 2 | Pending |
+| TEST-05 | Phase 2 | Complete |
 
 **Coverage:**
 - v1 requirements: 12 total
