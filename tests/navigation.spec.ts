@@ -100,4 +100,43 @@ test.describe('Navigation', () => {
     const current = await getCurrentSlideIndex(page);
     expect(current).toBe(total - 1);
   });
+
+  test('tap right side of screen advances slide', async ({ page }) => {
+    const total = await getTotalSlides(page);
+    const viewport = page.viewportSize()!;
+    // Click in the right half of the viewport — triggers tap-to-navigate
+    await page.mouse.click(viewport.width * 0.75, viewport.height / 2);
+    await expect(page.locator('#slideCounter')).toHaveText(counterText(2, total));
+  });
+
+  test('tap left side of screen retreats slide', async ({ page }) => {
+    const total = await getTotalSlides(page);
+    const viewport = page.viewportSize()!;
+    // Navigate to slide 2 first
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('#slideCounter')).toHaveText(counterText(2, total));
+    await page.waitForTimeout(850);
+    // Click in the left half of the viewport — triggers tap-to-navigate backward
+    await page.mouse.click(viewport.width * 0.25, viewport.height / 2);
+    await expect(page.locator('#slideCounter')).toHaveText(counterText(1, total));
+  });
+
+  test('removed keys do not navigate — ArrowDown, ArrowUp, Space', async ({ page }) => {
+    const total = await getTotalSlides(page);
+    // Press ArrowDown — should NOT navigate
+    await page.keyboard.press('ArrowDown');
+    await page.waitForTimeout(200);
+    expect(await getCurrentSlideIndex(page)).toBe(0);
+    await expect(page.locator('#slideCounter')).toHaveText(counterText(1, total));
+
+    // Press Space — should NOT navigate
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(200);
+    expect(await getCurrentSlideIndex(page)).toBe(0);
+
+    // Press ArrowUp — should NOT navigate
+    await page.keyboard.press('ArrowUp');
+    await page.waitForTimeout(200);
+    expect(await getCurrentSlideIndex(page)).toBe(0);
+  });
 });

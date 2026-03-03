@@ -91,4 +91,61 @@ test.describe('Desktop regression', () => {
     );
     expect(transitionValue).toContain('opacity');
   });
+
+  test('nav theme is "dark" on cover slide (dark background)', async ({ page }) => {
+    // Slide 0 is the cover slide with dark background — nav should be white (dark theme)
+    await expect(page.locator('body')).toHaveAttribute('data-nav-theme', 'dark');
+  });
+
+  test('nav theme switches to "light" on light-background slide', async ({ page }) => {
+    // Slide 3 (Letter) has a light background
+    await page.evaluate(() => (window as any).goToSlide(3));
+    await page.waitForTimeout(850);
+    await expect(page.locator('body')).toHaveAttribute('data-nav-theme', 'light');
+  });
+
+  test('nav theme switches back to "dark" on dark-background slide', async ({ page }) => {
+    // Go to light slide first
+    await page.evaluate(() => (window as any).goToSlide(3));
+    await page.waitForTimeout(850);
+    await expect(page.locator('body')).toHaveAttribute('data-nav-theme', 'light');
+    // Now go to slide 6 (dark-slide class)
+    await page.evaluate(() => (window as any).goToSlide(6));
+    await page.waitForTimeout(850);
+    await expect(page.locator('body')).toHaveAttribute('data-nav-theme', 'dark');
+  });
+
+  test('topbar text color adapts to nav theme', async ({ page }) => {
+    // On dark theme (slide 0), topbar-logo should be light (--white = #fafafa)
+    const lightColor = await page.locator('.topbar-logo').evaluate(
+      (el) => getComputedStyle(el).color
+    );
+    // --white is rgb(250, 250, 250) — a light color
+    expect(lightColor).toMatch(/rgb\(2[45]\d, 2[45]\d, 2[45]\d\)/);
+
+    // Navigate to light slide (slide 3)
+    await page.evaluate(() => (window as any).goToSlide(3));
+    await page.waitForTimeout(850);
+    const darkColor = await page.locator('.topbar-logo').evaluate(
+      (el) => getComputedStyle(el).color
+    );
+    // On light theme, topbar-logo should be dark/black — NOT the same light color
+    expect(darkColor).not.toBe(lightColor);
+  });
+
+  test('slide counter color adapts to nav theme', async ({ page }) => {
+    // On dark theme (slide 0), slide counter text should be light
+    const lightColor = await page.locator('#slideCounter').evaluate(
+      (el) => getComputedStyle(el).color
+    );
+    expect(lightColor).toMatch(/rgb\(2[45]\d, 2[45]\d, 2[45]\d\)/);
+
+    // Navigate to light slide
+    await page.evaluate(() => (window as any).goToSlide(3));
+    await page.waitForTimeout(850);
+    const darkColor = await page.locator('#slideCounter').evaluate(
+      (el) => getComputedStyle(el).color
+    );
+    expect(darkColor).not.toBe(lightColor);
+  });
 });
