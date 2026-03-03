@@ -12,3 +12,9 @@ additional content/
 publications/
 assets/
 Wolfond 2025 report/
+
+# Playwright / npm
+node_modules/
+test-results/
+playwright-report/
+blob-report/
