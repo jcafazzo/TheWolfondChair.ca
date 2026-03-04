@@ -173,6 +173,10 @@ body[data-kiosk] .slide {
   scroll-behavior: auto;
   scrollbar-width: none;
 }
+/* ═══ Kiosk: vertically center content on short slides ═══ */
+body[data-kiosk] .slide.kiosk-short {
+  align-items: center;
+}
 body[data-kiosk] .slide::-webkit-scrollbar { display: none; }
 
 /* ═══ Nav theme: light slides ═══ */
@@ -1304,13 +1308,15 @@ function startAutoScroll() {
   if (!slideEl) return;
   if (slideEl.scrollHeight > slideEl.clientHeight) {
     // Tall slide — auto-scroll from top to bottom
+    slideEl.classList.remove('kiosk-short');
     slideEl.scrollTop = 0;
     autoScrollActive = true;
     autoScrollPaused = true;
     autoScrollStartTime = performance.now();
     autoScrollRAF = requestAnimationFrame(autoScrollTick);
   } else {
-    // Short slide — Ken Burns zoom
+    // Short slide — Ken Burns zoom + vertical centering
+    slideEl.classList.add('kiosk-short');
     startKenBurns(slideEl);
   }
 }
@@ -1329,8 +1335,8 @@ function autoScrollTick(timestamp) {
   var slideEl = slides[current];
   var scrollableDistance = slideEl.scrollHeight - slideEl.clientHeight;
   if (scrollableDistance <= 0) { autoScrollActive = false; return; }
-  // Use minimum speed of 5px/sec so scroll is always visibly moving
-  var MIN_PX_PER_SEC = 5;
+  // Use minimum speed of 15px/sec so scroll is clearly visible
+  var MIN_PX_PER_SEC = 15;
   var timeBudget = (getSlideDuration() * 1000) - SCROLL_PAUSE_MS - 2000;
   if (timeBudget <= 0) timeBudget = 1000;
   var minSpeedDuration = (scrollableDistance / MIN_PX_PER_SEC) * 1000;
@@ -1376,14 +1382,15 @@ function kenBurnsTick(timestamp) {
     }
   }
   var slideEl = slides[current];
-  var duration = (getSlideDuration() * 1000) - SCROLL_PAUSE_MS;
-  if (duration <= 0) duration = 1000;
+  var KB_DURATION_MS = 30000; // 30-second ease-in-out zoom cycle
   var elapsed = timestamp - autoScrollStartTime;
-  var progress = Math.min(elapsed / duration, 1.0);
-  var scale = 1 + (0.20 * progress);
+  // Ease in-out: scale 1.0 → 1.4 over 30s using sinusoidal easing
+  var t = Math.min(elapsed / KB_DURATION_MS, 1.0);
+  var eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; // ease-in-out quad
+  var scale = 1 + (0.40 * eased);
   slideEl.style.transform = 'scale(' + scale + ')';
   slideEl.style.transformOrigin = 'center center';
-  if (progress < 1.0) {
+  if (t < 1.0) {
     autoScrollRAF = requestAnimationFrame(kenBurnsTick);
   } else {
     autoScrollActive = false;
@@ -1394,6 +1401,7 @@ function stopKenBurns() {
   for (var i = 0; i < slides.length; i++) {
     slides[i].style.transform = '';
     slides[i].style.transformOrigin = '';
+    slides[i].classList.remove('kiosk-short');
   }
 }
 
