@@ -1,208 +1,180 @@
 # Architecture
 
-**Analysis Date:** 2026-03-02
+**Analysis Date:** 2026-03-04
 
 ## Pattern Overview
 
-**Overall:** Single-Page Application (SPA) with Slide Deck Pattern
+**Overall:** Single-page presentation application with embedded slide deck architecture
 
 **Key Characteristics:**
-- Monolithic HTML file containing all markup, styles, and logic
-- Presentation-driven architecture with slide-based navigation
-- Client-side state management for slide progression
-- Embedded media (images, videos) with Vimeo integration
-- CSS-in-HTML with CSS custom properties for theming
+- Monolithic HTML file containing all presentation content, styles, and JavaScript
+- Client-side state management with minimal dependencies
+- Viewport-aware navigation with responsive design
+- Media-rich content with lazy-loaded assets and embedded video players
 
 ## Layers
 
 **Presentation Layer:**
-- Purpose: Render slide-based UI with animations and transitions
-- Location: `wolfond-report-2024-2026.html` (styles: lines 9-500+)
-- Contains: CSS classes for slide variants, typography, navigation UI, animations
-- Depends on: None (CSS only)
-- Used by: HTML markup sections
+- Purpose: Render slide content and manage visual transitions
+- Location: `wolfond-report-2024-2026.html` (CSS styles, lines 9-450)
+- Contains: Global CSS variables (color palette, typography scales, transitions), slide layout classes, component styles
+- Depends on: None
+- Used by: All interactive elements
 
-**Markup Layer:**
-- Purpose: Semantic HTML structure defining slide content and layout
-- Location: `wolfond-report-2024-2026.html` (HTML: lines 670+)
-- Contains: Slide templates, media embeds, team cards, publication lists
-- Depends on: JavaScript state and data
-- Used by: Presentation layer for styling, JavaScript for manipulation
+**Navigation Layer:**
+- Purpose: Handle slide traversal, state transitions, and UI updates
+- Location: `wolfond-report-2024-2026.html` (JavaScript functions, lines 1240-1337)
+- Contains: `goToSlide()`, `nextSlide()`, `prevSlide()`, keyboard/tap/swipe event handlers, counter updates
+- Depends on: Presentation Layer (DOM manipulation), State Layer
+- Used by: User interactions (keyboard, clicks, touch)
 
-**Logic/Behavior Layer:**
-- Purpose: Slide navigation, state management, dynamic content rendering, media controls
-- Location: `wolfond-report-2024-2026.html` (script section: lines 1008+)
-- Contains: Slide engine, video modal, auto-advance timers, event handlers
-- Depends on: DOM API, Vimeo API
-- Used by: User interactions, initialization
+**State Layer:**
+- Purpose: Track current slide index and transition state
+- Location: `wolfond-report-2024-2026.html` (global variables)
+- Contains: `current` (current slide index, 0-based), `isTransitioning` (boolean flag preventing concurrent transitions), `slides` (NodeList of DOM elements)
+- Depends on: None
+- Used by: Navigation Layer, Counter/Theme Layer
+
+**Content Generation Layer:**
+- Purpose: Dynamically generate slide markup from data
+- Location: `wolfond-report-2024-2026.html` (function `buildSlides()`, lines 585-1040)
+- Contains: 15+ slide template generators (`cover`, `full-image`, `split`, `deep-slide`, `letter-slide`, `grid-slide`, etc.)
+- Depends on: Data Layer
+- Used by: Initialization layer
 
 **Data Layer:**
-- Purpose: Publication lists and team member information
-- Location: `wolfond-report-2024-2026.html` (embedded objects: `publications`, `team`)
-- Contains: Peer-reviewed publication metadata, team member names/roles
+- Purpose: Store structured content (publications, team members, conversation videos)
+- Location: `wolfond-report-2024-2026.html` (constants and arrays, lines 546-582)
+- Contains: `TEAM_PHOTOS` (object mapping names to image URLs), `UHN_IMG`, `CAMPUS_IMG`, `publications` array
 - Depends on: None
-- Used by: Logic layer for dynamic content generation
+- Used by: Content Generation Layer
+
+**Media & Autoplay Layer:**
+- Purpose: Manage video embeds, autoplay on specific slides, mute controls
+- Location: `wolfond-report-2024-2026.html` (functions 1043-1169)
+- Contains: `openVideoModal()`, `closeVideoModal()`, `setupConvoAutoplay()`, `toggleVideoMute()`, Vimeo embed URLs
+- Depends on: Navigation Layer (triggered on slide transitions)
+- Used by: Video modals, Conversations slide, Wolfond Brothers slide
+
+**Counter & Theme Layer:**
+- Purpose: Update slide counter display and apply theme (dark/light nav styling)
+- Location: `wolfond-report-2024-2026.html` (functions 1137-1240)
+- Contains: `updateCounter()`, `getSlideTheme()`, `applyNavTheme()`, auto-advance logic
+- Depends on: State Layer, Navigation Layer
+- Used by: Navigation Layer on every slide transition
 
 ## Data Flow
 
+**Slide Navigation:**
+
+1. User action (arrow key, click, swipe, tap) triggered
+2. Event handler (`keydown`, `click`, `touchend`) invokes `nextSlide()` or `prevSlide()`
+3. `nextSlide()`/`prevSlide()` call `goToSlide(index)`
+4. `goToSlide()` checks state (`isTransitioning`, boundary conditions)
+5. State updated: `current = index`, `isTransitioning = true`
+6. DOM manipulated: Previous slide gets `.exiting` class, next slide gets `.active` class
+7. CSS transition plays (0.8s)
+8. After 800ms timeout: `.exiting` class removed, `isTransitioning = false`
+9. Side effects triggered: theme applied, counter updated, specific media autoplay configured
+10. Auto-advance timer reset
+
 **Initial Page Load:**
 
-1. Browser requests `index.html` (redirect) → serves `wolfond-report-2024-2026.html`
-2. Browser parses HTML, loads CSS variables (`:root`), executes inline script
-3. `init()` function called on page load (window load event, line 1143+)
-4. `buildSlides()` generates all 17 slide HTML templates as strings
-5. `deck.innerHTML` populated with generated slide HTML
-6. DOM queries populate `slides` NodeList and navigation dots
-7. First slide gets `active` class, auto-advance timer starts
-8. Publications list populated by `buildPubList()` into `#pubList`
-9. Conversation autoplay setup randomly selects one video for background
-10. Page becomes interactive for user navigation and interaction
-
-**User Navigation:**
-
-1. User clicks navigation dot, arrow button, or keyboard input
-2. `goToSlide(index)` called with target slide index
-3. Previous slide removed `active` class, gets `exiting` class
-4. Next slide gets `active` class
-5. CSS transitions animate opacity/transform over 0.8s
-6. After 800ms, `exiting` class removed, transition complete
-7. Navigation dots update to reflect current slide
-8. Counter updates to show `current / total` slides
-9. Media videos on slide 12 load Vimeo iframes on entry, clear on exit
-10. Auto-advance timer resets on any user interaction
-
-**Video Playback:**
-
-1. User clicks video thumbnail or opens modal
-2. `openVideoModal(vimeoId, caption)` called
-3. Modal iframe `src` set to Vimeo player URL with autoplay parameter
-4. Modal gets `open` class, then `visible` class (animation delay)
-5. Video plays in embedded player
-6. User can toggle mute on media slide videos
-7. Close button or Escape key calls `closeVideoModal()`
-8. Modal animates out, iframe src cleared, body overflow restored
+1. `window.addEventListener('load', init)` fires when page loaded
+2. `init()` function executes:
+   - Calls `buildSlides()` to generate all slide HTML from data
+   - Sets `deck.innerHTML` with generated slide HTML
+   - Queries all `.slide` elements into `slides` NodeList
+   - Populates `.slide-nav` with navigation dots
+   - Sets first slide to `.active` and applies theme
+   - Updates counter display
+   - Builds publications list
+   - Sets up conversation autoplay
+   - Starts auto-advance timer
 
 **State Management:**
 
-- `current`: Current slide index (0-16)
-- `slides`: NodeList of all .slide elements
-- `isTransitioning`: Boolean flag preventing overlapping transitions
-- `autoTimer`: Interval ID for auto-advance (120 second intervals)
-- `convoPickIndex`: Randomly selected conversation video index
-- `secondsLeft`: Countdown display for auto-advance timer
-- No external state management; all state lives on window scope
+- **Current slide:** Global `current` variable (0-based index)
+- **Transition flag:** `isTransitioning` prevents rapid successive clicks during animation
+- **Slide timeout:** Auto-advance timer (`autoAdvanceTimeout`) pauses on user action, resumes after 5 seconds idle
+- **Auto-advance interval:** Conversation slide cycles through random videos (`convoAutoplayInterval`)
+- **Video mute state:** Tracked on mute buttons via `data-muted` attribute (not global)
 
 ## Key Abstractions
 
-**Slide Template System:**
+**Slide Variant Pattern:**
+- Purpose: Encapsulate different slide layouts and content structures
+- Examples: `buildSlide_Cover()`, `buildSlide_FullImage()`, `buildSlide_Split()`, `buildSlide_DeepSlide()`, `buildSlide_LetterSlide()`, `buildSlide_GridSlide()`
+- Pattern: Each variant is a function returning HTML string; all concatenated in `buildSlides()`
+- Usage: Single HTML file with no separate template files
 
-- Purpose: Generate slide HTML as strings, then inject into DOM
-- Examples: `buildSlides()` function returns array of 17 template strings (lines 437-1006)
-- Pattern: Template literals with conditional CSS classes, event handlers inline
-- Each template represents a unique slide variant (cover, split, deep-slide, dark-slide, grid-slide, etc.)
+**Navigation Theme:**
+- Purpose: Adapt navigation UI (dots, arrows, counter) to slide background
+- Pattern: `getSlideTheme()` returns `'dark'` or `'light'` based on slide classes; `applyNavTheme()` sets `data-nav-theme` attribute on body
+- Implementation: CSS attribute selectors (`body[data-nav-theme="light"]`) override colors
+- Motivation: Ensure navigation is always readable against any background
 
-**Slide Variant Classes:**
-
-- Purpose: Define distinct visual and layout patterns for different content types
-- Examples: `cover`, `split`, `split-reverse`, `deep-slide`, `dark-slide`, `letter-slide`, `grid-slide`, `full-image`
-- Pattern: CSS classes applied to `.slide` element, define flex/grid layout, background, text colors
-- Used for: Cover slide, split text/image, project deep dives, media grid, team showcase, closing image
-
-**Responsive Design System:**
-
-- Purpose: Adapt layout for mobile, tablet, and desktop
-- Location: Media queries at lines 69, 119-123, 167-171, 263, 295-298, 858
-- Pattern: Mobile-first with breakpoints at 600px, 700px, 768px, 900px
-- Adjusts: Padding, grid columns, font sizes via `clamp()`, visibility of UI elements
-
-**Animation Engine:**
-
-- Purpose: Smooth transitions between slides and entrance animations for content
+**Touch-aware Interaction:**
+- Purpose: Support both click/keyboard and touch gestures
 - Patterns:
-  - Slide transitions: Opacity 0.8s ease + transform translateY 0.8s cubic-bezier
-  - Stagger animations: Child elements animate with 150ms delay increments (lines 53-58)
-  - Entrance keyframes: `staggerIn` animates opacity and translateY
-- Trigger: `.active` class adds animation, `.exiting` class removes it
+  - `click` event: Right half of viewport advances, left half retreats
+  - `touchstart`/`touchend`: Swipe right/left to navigate (minimum 40px threshold, ignores vertical scroll)
+  - `keydown`: ArrowLeft/ArrowRight only (ArrowUp/ArrowDown/Space disabled per design)
+- Ignored targets: Navigation elements, interactive components (buttons, inputs, iframes, filters)
 
-**Media Modal System:**
-
-- Purpose: Display videos in fullscreen modal overlay
-- Examples: `openVideoModal()`, `closeVideoModal()` (lines 1009-1031)
-- Pattern: Modal div with iframe, keyboard escape support, click-outside-to-close
-- Supports: Vimeo embed parameters (autoplay, fullscreen, portrait control)
-
-**Publication Rendering:**
-
-- Purpose: Dynamically generate publication list from data array
-- Example: `buildPubList()` (referenced but logic in DOM, line 1156)
-- Pattern: Iterate `publications` array, append `.pub-row` divs with citation formatting
-- Features: Year, author, title, DOI links with visual styling
-
-**Video Muting Control:**
-
-- Purpose: Toggle between muted and unmuted states for background videos
-- Example: `toggleVideoMute(btn)` (lines 1075-1094)
-- Pattern: Manipulate Vimeo URL parameters (muted=1 → muted=0)
-- Features: Visual indicator (speaker icon changes), border color feedback
+**Video Autoplay Orchestration:**
+- Purpose: Lazy-load and autoplay Vimeo videos only when visible
+- Pattern: `goToSlide()` conditionally sets iframe `src` attribute based on slide index
+- Specific cases:
+  - Slide 12 (Media): Controls two background videos (`mediaCdtxFrame`, `mediaChinFrame`)
+  - Slide 15 (Wolfond Brothers): Controls one autoplay video (`gregAutoplayFrame`)
+  - Slide 13 (Conversations): Triggers `startConvoAutoplay()` which cycles random videos
+- Motivation: Reduce bandwidth, improve initial load time
 
 ## Entry Points
 
-**Page Load:**
+**HTML Document:**
+- Location: `/wolfond-report-2024-2026.html`
+- Triggers: Browser load event
+- Responsibilities: Serve entire application (HTML, CSS, JS, content)
 
-- Location: `wolfond-report-2024-2026.html` script section
-- Triggers: `window.addEventListener('load', init)` or similar
-- Responsibilities: Initializes slide deck, builds DOM, starts auto-advance, sets up keyboard listeners
+**Initialization Function:**
+- Location: `init()` function, line 1213
+- Triggers: `window.addEventListener('load', init)`
+- Responsibilities: Build slide deck from data, populate navigation UI, set initial active slide, start autoplay loops
 
-**Navigation Controls:**
-
-- Location: Navigation dots (`.slide-dot`), arrows (`.slide-arrow`), keyboard events
-- Triggers: User click or keypress (ArrowRight, ArrowLeft, Space, etc.)
-- Responsibilities: Call `goToSlide()` with target index
-
-**Media Playback:**
-
-- Location: Video thumbnails, "Conversations" slide thumbnails, modal triggers
-- Triggers: Click on `.convo-thumb`, link in media grid, or carousel controls
-- Responsibilities: Load Vimeo iframe, display modal, manage autoplay state
-
-**Keyboard Navigation:**
-
-- Location: Document-level event listener (implied in goToSlide logic)
-- Triggers: Arrow keys, Space, Escape
-- Responsibilities: Navigate slides, close modals, reset auto-advance timer
+**Navigation Handler:**
+- Location: `goToSlide(index)` function, line 1240
+- Triggers: Keyboard, clicks, swipes, navigation dots, arrow buttons, logo click (back to slide 0)
+- Responsibilities: Validate navigation, update DOM classes, manage transitions, apply theme, update counter, orchestrate media autoplay
 
 ## Error Handling
 
-**Strategy:** Minimal error handling; relies on graceful degradation
+**Strategy:** Defensive guards and safe defaults
 
 **Patterns:**
+- Boundary checking in `goToSlide()`: `if (index < 0 || index >= slides.length) return` prevents out-of-bounds
+- Transition locking: `isTransitioning` flag prevents concurrent animations
+- Null checks for optional elements: `if (cdtxFrame) { ... }` before setting video src
+- Slide index validation: `if (index === current || isTransitioning) return` exits early if no-op
+- Safe DOM queries: `document.getElementById()` with existence checks before manipulation
 
-- Missing elements: Null checks (e.g., `if (!element) return;` before accessing properties)
-- Vimeo API: Relies on URL-based parameters; no error callback handling
-- DOM queries: All queries are defensive (`document.getElementById()`, `.querySelector()`)
-- Video loading: No timeout or fallback if Vimeo fails; video simply won't display
+**No try-catch blocks** — application assumes HTML structure is correct and DOM is always available
 
 ## Cross-Cutting Concerns
 
-**Logging:** None implemented. No console logging or analytics.
+**Logging:** None implemented. Errors silently fail due to guards.
 
-**Validation:** None implemented. All data is hardcoded or trusted from HTML.
+**Validation:** Input validation only (slide indices), no content validation.
 
-**Authentication:** Not applicable. Public website, no user accounts.
+**Authentication:** Not applicable — static presentation.
 
-**Accessibility:** Partial implementation
-- Semantic HTML with `aria-label` on navigation dots (line 1151)
-- Keyboard navigation support (Escape to close modals)
-- Color contrast via CSS custom properties
-- Missing: ARIA labels for video buttons, form validation, skip-to-content links
-
-**Performance Concerns:**
-- All 17 slides rendered upfront (no lazy loading of off-screen slides)
-- Full HTML file is 82KB (monolithic, not split)
-- CSS not minified; all in head
-- Images embedded as separate files in `images/` directory (not WebP optimization for all)
-- No caching headers or service worker
+**Responsive Design:** Handled entirely via CSS media queries (`@media (max-width: 768px)`, `@media (max-width: 900px)`):
+- Navigation dots hidden on mobile
+- Padding reduced
+- Split layouts stack to single column
+- Video grid collapses to single column
 
 ---
 
-*Architecture analysis: 2026-03-02*
+*Architecture analysis: 2026-03-04*
