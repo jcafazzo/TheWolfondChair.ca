@@ -1236,11 +1236,8 @@ function clearCursorHideTimer() {
 function enterKiosk() {
   isKioskMode = true;
   document.body.setAttribute('data-kiosk', '');
-  // Pre-classify all slides as short (kiosk-short) to prevent centering jump;
-  // startAutoScroll will remove the class for slides that need scrolling
-  for (var i = 0; i < slides.length; i++) { slides[i].classList.add('kiosk-short'); }
   startAutoAdvance(); // fresh timer from current slide
-  startAutoScroll();
+  startAutoScroll(); // classifies current slide synchronously (no jump)
   // Request fullscreen
   if (document.documentElement.requestFullscreen) {
     document.documentElement.requestFullscreen().catch(() => {});
@@ -1467,6 +1464,14 @@ function goToSlide(index) {
   const next = slides[index];
   prev.classList.remove('active');
   prev.classList.add('exiting');
+  // Pre-classify incoming slide BEFORE it becomes visible to prevent centering jump
+  if (isKioskMode) {
+    if (next.scrollHeight - next.clientHeight > 10) {
+      next.classList.remove('kiosk-short');
+    } else {
+      next.classList.add('kiosk-short');
+    }
+  }
   next.classList.add('active');
   setTimeout(() => { prev.classList.remove('exiting'); isTransitioning = false; }, 800);
   current = index;
