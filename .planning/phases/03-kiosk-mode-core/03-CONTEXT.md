@@ -17,7 +17,7 @@ Enter and exit a fully autonomous presentation loop via keystroke. Hide all navi
 - K key toggles kiosk mode on and off (mnemonic for "Kiosk")
 - Same key both enters and exits — simple toggle behavior
 - Entering kiosk always starts auto-advance fresh (reset 2-min timer from zero)
-- Do NOT request browser fullscreen — just hide presentation chrome
+- Request browser fullscreen via Fullscreen API on enter, exit fullscreen on kiosk exit
 
 ### Chrome hiding
 - Fade out all chrome over ~0.5s using opacity transition (matches existing CSS transition style)
