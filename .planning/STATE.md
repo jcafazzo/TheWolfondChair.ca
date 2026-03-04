@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: completed
-stopped_at: Phase 3 context gathered
-last_updated: "2026-03-04T15:56:13.215Z"
+stopped_at: "Completed 03-01 Task 1 — awaiting checkpoint:human-verify (Task 2)"
+last_updated: "2026-03-04T16:42:32.773Z"
 last_activity: 2026-03-04 — Roadmap created for v1.1
 progress:
   total_phases: 5
-  completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
+  completed_phases: 3
+  total_plans: 7
+  completed_plans: 7
 ---
 
 # Project State
@@ -25,17 +25,17 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 ```
-[Phase 3] Kiosk Mode Core    [ ] Not started
+[Phase 3] Kiosk Mode Core    [~] In progress (03-01 Task 1 done, awaiting Task 2 checkpoint)
 [Phase 4] Slow Auto-Scroll   [ ] Not started
 [Phase 5] Portrait Display   [ ] Not started
 
 Progress: 0/3 phases complete
 ```
 
-Phase: 3 (Kiosk Mode Core) — ready to plan
-Plan: —
-Status: Roadmap complete, awaiting plan-phase
-Last activity: 2026-03-04 — Roadmap created for v1.1
+Phase: 3 (Kiosk Mode Core) — plan 01 in progress
+Plan: 03-01 (Task 2 checkpoint:human-verify pending)
+Status: Awaiting human verification of kiosk mode visuals
+Last activity: 2026-03-04 — Kiosk mode implemented, tests passing
 
 ## Performance Metrics
 
@@ -55,6 +55,8 @@ Last activity: 2026-03-04 — Roadmap created for v1.1
 - [v1.1]: Kiosk mode loops continuously (unattended display should never stop)
 - [v1.1]: Portrait mode via CSS transform or iframe wrapper — no OS-level rotation
 - [v1.1]: Manual keystroke toggle for portrait mode on any screen
+- [Phase 03-kiosk-mode-core]: Use var (not let) for isKioskMode and other state variables needing window.xxx access in Playwright tests
+- [Phase 03-kiosk-mode-core]: K key check must be first in keydown handler before all other key logic
 
 ### Pending Todos
 
@@ -66,6 +68,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-04T15:56:13.211Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-kiosk-mode-core/03-CONTEXT.md
+Last session: 2026-03-04T16:42:32.769Z
+Stopped at: Completed 03-01 Task 1 — awaiting checkpoint:human-verify (Task 2)
+Resume file: None

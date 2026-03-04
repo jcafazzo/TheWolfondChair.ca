@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Mobile Fixes** - Apply all CSS and JS corrections that make mobile navigation, scrolling, and touch interaction work correctly (v1.0 complete)
 - [x] **Phase 2: Playwright Tests** - Build the E2E test suite that asserts the fixed behavior and guards against desktop regression (v1.0 complete)
-- [ ] **Phase 3: Kiosk Mode Core** - Toggle kiosk mode on/off via keystroke, loop the presentation continuously, and hide all navigation chrome while active
+- [x] **Phase 3: Kiosk Mode Core** - Toggle kiosk mode on/off via keystroke, loop the presentation continuously, and hide all navigation chrome while active (completed 2026-03-04)
 - [ ] **Phase 4: Slow Auto-Scroll** - Auto-scroll each slide from top to bottom over its 2-minute interval, adapting to content height and resetting on slide advance
 - [ ] **Phase 5: Portrait Display** - Rotate and scale the presentation 90° for portrait-oriented screens via keystroke toggle, working in combination with kiosk mode
 
@@ -55,7 +55,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. In kiosk mode, after slide 17 the presentation automatically advances to slide 1 and continues looping without stopping
   3. Pressing the designated key while in kiosk mode exits it — navigation chrome reappears and auto-advance stops
   4. Normal keyboard, dot, and arrow navigation works exactly as before when kiosk mode is off
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 03-01-PLAN.md — Kiosk mode toggle with chrome hiding, event suppression, and E2E tests
 
@@ -90,6 +90,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Mobile Fixes | 3/3 | Complete | 2026-03-02 |
 | 2. Playwright Tests | 3/3 | Complete | 2026-03-03 |
-| 3. Kiosk Mode Core | 0/1 | Planning complete | - |
+| 3. Kiosk Mode Core | 1/1 | Complete   | 2026-03-04 |
 | 4. Slow Auto-Scroll | 0/? | Not started | - |
 | 5. Portrait Display | 0/? | Not started | - |

@@ -13,10 +13,10 @@ Requirements for kiosk mode milestone. Each maps to roadmap phases.
 
 ### Kiosk Playback
 
-- [ ] **KIOSK-01**: User can press a key to enter kiosk mode (starts auto-advance, hides nav chrome)
-- [ ] **KIOSK-02**: Presentation loops from last slide back to slide 1 in kiosk mode
-- [ ] **KIOSK-03**: User can press a key to exit kiosk mode (restores nav, stops auto-advance)
-- [ ] **KIOSK-04**: Kiosk mode hides dots, arrows, counter, and progress bar
+- [x] **KIOSK-01**: User can press a key to enter kiosk mode (starts auto-advance, hides nav chrome)
+- [x] **KIOSK-02**: Presentation loops from last slide back to slide 1 in kiosk mode
+- [x] **KIOSK-03**: User can press a key to exit kiosk mode (restores nav, stops auto-advance)
+- [x] **KIOSK-04**: Kiosk mode hides dots, arrows, counter, and progress bar
 
 ### Auto-Scroll
 
@@ -56,10 +56,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| KIOSK-01 | Phase 3 | Pending |
-| KIOSK-02 | Phase 3 | Pending |
-| KIOSK-03 | Phase 3 | Pending |
-| KIOSK-04 | Phase 3 | Pending |
+| KIOSK-01 | Phase 3 | Complete |
+| KIOSK-02 | Phase 3 | Complete |
+| KIOSK-03 | Phase 3 | Complete |
+| KIOSK-04 | Phase 3 | Complete |
 | SCROLL-01 | Phase 4 | Pending |
 | SCROLL-02 | Phase 4 | Pending |
 | SCROLL-03 | Phase 4 | Pending |
