@@ -68,7 +68,9 @@ Plans:
   2. A slide with content shorter than the viewport does not scroll at all — no visible movement occurs
   3. When kiosk mode advances to the next slide, the scroll position of the previous slide resets to the top before that slide could be seen again
   4. Entering and exiting kiosk mode correctly starts and stops the auto-scroll — no runaway scroll timer persists after exiting
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 04-01-PLAN.md — Auto-scroll engine with Ken Burns zoom, per-slide duration support, topbar title fix, and E2E tests
 
 ### Phase 5: Portrait Display
 **Goal**: Users can force a portrait orientation on any screen via keystroke, rotating and scaling the presentation to fill a physically rotated monitor
@@ -91,5 +93,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Mobile Fixes | 3/3 | Complete | 2026-03-02 |
 | 2. Playwright Tests | 3/3 | Complete | 2026-03-03 |
 | 3. Kiosk Mode Core | 1/1 | Complete   | 2026-03-04 |
-| 4. Slow Auto-Scroll | 0/? | Not started | - |
+| 4. Slow Auto-Scroll | 0/1 | Not started | - |
 | 5. Portrait Display | 0/? | Not started | - |
