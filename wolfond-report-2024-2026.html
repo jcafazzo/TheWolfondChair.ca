@@ -1376,7 +1376,7 @@ function kenBurnsTick(timestamp) {
   if (duration <= 0) duration = 1000;
   var elapsed = timestamp - autoScrollStartTime;
   var progress = Math.min(elapsed / duration, 1.0);
-  var scale = 1 + (0.02 * progress);
+  var scale = 1 + (0.05 * progress);
   slideEl.style.transform = 'scale(' + scale + ')';
   slideEl.style.transformOrigin = 'center center';
   if (progress < 1.0) {
@@ -1512,9 +1512,9 @@ document.addEventListener('keydown', (e) => {
     else enterKiosk();
     return;
   }
-  if (isKioskMode) return; // suppress all other keys in kiosk
-  if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); }
-  else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); return; }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); return; }
+  if (isKioskMode) return; // suppress all other keys in kiosk (arrows allowed above)
 });
 
 // Tap-to-navigate — tap right side to advance, left side to go back

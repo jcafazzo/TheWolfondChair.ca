@@ -81,21 +81,26 @@ test.describe('Kiosk Mode', () => {
     expect(parseFloat(topbarOpacity)).toBeGreaterThan(0);
   });
 
-  test('arrow keys do not change slide while kiosk is active', async ({ page }) => {
+  test('arrow keys navigate slides while kiosk is active', async ({ page }) => {
     const initialIndex = await getCurrentSlideIndex(page);
 
     // Enter kiosk mode
     await page.keyboard.press('k');
     await page.waitForTimeout(100);
 
-    // Try to navigate with arrow keys
+    // Arrow right should advance to next slide
     await page.keyboard.press('ArrowRight');
-    await page.waitForTimeout(200);
-    await page.keyboard.press('ArrowLeft');
-    await page.waitForTimeout(200);
+    await page.waitForTimeout(850); // wait for slide transition
 
-    const currentIndex = await getCurrentSlideIndex(page);
-    expect(currentIndex).toBe(initialIndex);
+    const afterRight = await getCurrentSlideIndex(page);
+    expect(afterRight).toBe(initialIndex + 1);
+
+    // Arrow left should go back
+    await page.keyboard.press('ArrowLeft');
+    await page.waitForTimeout(850);
+
+    const afterLeft = await getCurrentSlideIndex(page);
+    expect(afterLeft).toBe(initialIndex);
 
     // Exit kiosk mode
     await page.keyboard.press('k');
@@ -120,26 +125,24 @@ test.describe('Kiosk Mode', () => {
     await page.keyboard.press('k');
   });
 
-  test('after exiting kiosk, arrow keys work normally again', async ({ page }) => {
-    const total = await page.evaluate(() => document.querySelectorAll('.slide').length);
-
+  test('after exiting kiosk, arrow keys continue to work normally', async ({ page }) => {
     // Enter kiosk mode
     await page.keyboard.press('k');
     await page.waitForTimeout(100);
 
-    // Verify arrow key is suppressed
+    // Arrow key works in kiosk
     await page.keyboard.press('ArrowRight');
-    await page.waitForTimeout(200);
-    expect(await getCurrentSlideIndex(page)).toBe(0);
+    await page.waitForTimeout(850);
+    expect(await getCurrentSlideIndex(page)).toBe(1);
 
     // Exit kiosk mode
     await page.keyboard.press('k');
     await page.waitForTimeout(100);
 
-    // Now arrow key should work
+    // Arrow key still works outside kiosk
     await page.keyboard.press('ArrowRight');
-    await page.waitForTimeout(200);
-    expect(await getCurrentSlideIndex(page)).toBe(1);
+    await page.waitForTimeout(850);
+    expect(await getCurrentSlideIndex(page)).toBe(2);
   });
 
   test('video modal is suppressed in kiosk mode — openVideoModal is blocked', async ({ page }) => {
