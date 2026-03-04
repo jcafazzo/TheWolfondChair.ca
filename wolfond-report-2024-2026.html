@@ -1296,6 +1296,11 @@ function init() {
   buildPubList();
   setupConvoAutoplay();
   startAutoAdvance();
+
+  // ?kiosk URL param — enter kiosk mode without keyboard
+  if (new URLSearchParams(window.location.search).has('kiosk')) {
+    enterKiosk();
+  }
 }
 
 function getSlideTheme(slideEl) {
