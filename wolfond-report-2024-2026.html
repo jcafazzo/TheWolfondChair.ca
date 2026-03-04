@@ -38,19 +38,19 @@ body {
 a { color: var(--black); }
 
 /* ═══ Slide deck ═══ */
-.deck { height: 100vh; height: 100svh; overflow: hidden; position: relative; }
+.deck { min-height: 100vh; min-height: 100svh; overflow: visible; position: relative; }
 
 .slide {
   position: absolute; inset: 0;
   display: flex; align-items: flex-start; justify-content: center;
   opacity: 0; transform: translateY(40px);
   transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none; overflow-y: auto; overflow-x: hidden;
+  pointer-events: none; overflow: visible;
   touch-action: pan-y;
   overscroll-behavior-x: contain;
   -webkit-tap-highlight-color: transparent;
 }
-.slide.active { opacity: 1; transform: translateY(0); pointer-events: auto; z-index: 2; }
+.slide.active { position: relative; width: 100%; opacity: 1; transform: translateY(0); pointer-events: auto; z-index: 2; }
 .slide.exiting { opacity: 0; transform: translateY(-30px); pointer-events: none; z-index: 1; }
 
 /* Staggered entrance for child elements */
@@ -177,22 +177,20 @@ body[data-kiosk][data-nav-theme="dark"] .topbar {
 body[data-kiosk] {
   cursor: none;
 }
-/* ═══ Kiosk auto-scroll: allow slides to scroll, hide scrollbars ═══ */
-body[data-kiosk] .slide {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: auto;
+/* ═══ Kiosk auto-scroll: hide scrollbars, body scrolls ═══ */
+body[data-kiosk] {
   scrollbar-width: none;
 }
+body[data-kiosk]::-webkit-scrollbar { display: none; }
 /* ═══ Kiosk: vertically center content on short slides ═══ */
 body[data-kiosk] .slide.kiosk-short {
+  min-height: 100vh; min-height: 100svh;
   align-items: center;
   justify-content: center;
 }
 body[data-kiosk] .slide.kiosk-short .slide-inner {
   min-height: auto;
 }
-body[data-kiosk] .slide::-webkit-scrollbar { display: none; }
 
 /* ═══ Nav theme: light slides ═══ */
 body[data-nav-theme="light"] .topbar-logo { color: var(--black); }
@@ -430,12 +428,8 @@ a.pub-row:hover { opacity: 0.6; }
 .convo-card p { font-size: 0.875rem; color: var(--gray-600); line-height: 1.6; font-weight: 300; }
 
 .scroll-content {
-  max-height: calc(100dvh - 10rem); overflow-y: auto; width: 100%;
-  padding-right: 1rem; scrollbar-width: thin; scrollbar-color: var(--gray-300) transparent;
+  width: 100%; overflow: visible;
 }
-.scroll-content::-webkit-scrollbar { width: 4px; }
-.scroll-content::-webkit-scrollbar-track { background: transparent; }
-.scroll-content::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 4px; }
 
 .pub-filters { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
 .pub-filter {
@@ -749,7 +743,7 @@ function buildSlides() {
           <div class="deep-stat"><div class="deep-stat-val" style="color: white;">50%</div><div class="deep-stat-label">Fewer HF Hospitalizations</div></div>
           <div class="deep-stat"><div class="deep-stat-val" style="color: white;">VITALL</div><div class="deep-stat-label">Exclusive Global Licensee</div></div>
         </div>
-        <div class="scroll-content" style="max-height: calc(100dvh - 32rem);">
+        <div class="scroll-content">
           <ul class="highlight-list">
             <li><strong>VITALL Intelligence Inc.</strong> named UHN&rsquo;s exclusive global licensee (Aug 2025). Commercial availability launched Feb 2026, delivering Medly through VITALL&rsquo;s digital health platform to cardiac centres across North America.</li>
             <li><strong>Health Canada Class II Medical Device</strong> and <strong>FDA Breakthrough Device</strong> designation. AI features include Auto Titrate, Conversational AI (multilingual), Auto-Documentation, and After-Hours Chatbot.</li>
@@ -798,7 +792,7 @@ function buildSlides() {
           <div class="deep-stat"><div class="deep-stat-val" style="color: white;">&lt;2 min</div><div class="deep-stat-label">Clinician Review Time</div></div>
           <div class="deep-stat"><div class="deep-stat-val" style="color: white;">4</div><div class="deep-stat-label">Sites Across Canada</div></div>
         </div>
-        <div class="scroll-content" style="max-height: calc(100dvh - 32rem);">
+        <div class="scroll-content">
           <ul class="highlight-list">
             <li><strong>Pan-Canadian multi-site trial:</strong> Rockyview (Calgary), Trillium (Mississauga), Queen Elizabeth II (Halifax), and UHN (Toronto) &mdash; the largest trial of asynchronous cancer survivorship care in Canadian history.</li>
             <li><strong>Nurse Ned launched</strong> &mdash; an autonomous nurse-led triage layer with Care Steps, Nurse Touchpoints, and Messenger. Handles routine follow-ups and escalates flagged patients to oncologists.</li>
@@ -1243,6 +1237,9 @@ function clearCursorHideTimer() {
 function enterKiosk() {
   isKioskMode = true;
   document.body.setAttribute('data-kiosk', '');
+  // Pre-classify all slides as short (kiosk-short) to prevent centering jump;
+  // startAutoScroll will remove the class for slides that need scrolling
+  for (var i = 0; i < slides.length; i++) { slides[i].classList.add('kiosk-short'); }
   startAutoAdvance(); // fresh timer from current slide
   startAutoScroll();
   // Request fullscreen
@@ -1321,10 +1318,12 @@ function startAutoScroll() {
   stopAutoScroll();
   var slideEl = slides[current];
   if (!slideEl) return;
-  if (slideEl.scrollHeight - slideEl.clientHeight > 10) {
-    // Tall slide — auto-scroll from top to bottom (10px threshold for sub-pixel rounding)
+  // Scrollable distance = how far the page can scroll (body scroll, not embedded)
+  var scrollableDistance = document.documentElement.scrollHeight - window.innerHeight;
+  if (scrollableDistance > 10) {
+    // Tall slide — auto-scroll window from top to bottom
     slideEl.classList.remove('kiosk-short');
-    slideEl.scrollTop = 0;
+    window.scrollTo(0, 0);
     autoScrollActive = true;
     autoScrollPaused = true;
     autoScrollStartTime = performance.now();
@@ -1350,8 +1349,7 @@ function autoScrollTick(timestamp) {
       return;
     }
   }
-  var slideEl = slides[current];
-  var scrollableDistance = slideEl.scrollHeight - slideEl.clientHeight;
+  var scrollableDistance = document.documentElement.scrollHeight - window.innerHeight;
   if (scrollableDistance <= 0) { autoScrollActive = false; return; }
   // Use minimum speed of 12px/sec so scroll is clearly visible
   var MIN_PX_PER_SEC = 12;
@@ -1361,7 +1359,7 @@ function autoScrollTick(timestamp) {
   var duration = Math.min(timeBudget, minSpeedDuration);
   var elapsed = timestamp - autoScrollStartTime;
   var progress = Math.min(elapsed / duration, 1.0);
-  slideEl.scrollTop = progress * scrollableDistance;
+  window.scrollTo(0, progress * scrollableDistance);
   if (progress < 1.0) {
     autoScrollRAF = requestAnimationFrame(autoScrollTick);
   } else {
@@ -1376,9 +1374,10 @@ function stopAutoScroll() {
 }
 
 function resetSlideScroll(slideEl) {
-  slideEl.scrollTop = 0;
+  window.scrollTo(0, 0);
   slideEl.style.transform = '';
   slideEl.style.transformOrigin = '';
+  slideEl.classList.remove('kiosk-short');
 }
 
 function startKenBurns(slideEl) {
@@ -1467,12 +1466,23 @@ function goToSlide(index) {
   isTransitioning = true;
   const prev = slides[current];
   const next = slides[index];
+  // Scroll window to top before transition
+  window.scrollTo(0, 0);
   prev.classList.remove('active');
   prev.classList.add('exiting');
+  // Keep incoming slide absolute during transition to prevent layout shift
+  next.style.position = 'absolute';
+  next.style.inset = '0';
   next.classList.add('active');
-  setTimeout(() => { prev.classList.remove('exiting'); isTransitioning = false; }, 800);
+  setTimeout(() => {
+    prev.classList.remove('exiting');
+    // Now let active slide become relative (in-flow) for body scroll
+    next.style.position = '';
+    next.style.inset = '';
+    isTransitioning = false;
+  }, 800);
   current = index;
-  // Reset previous slide scroll position and stop auto-scroll
+  // Reset previous slide and stop auto-scroll
   resetSlideScroll(prev);
   if (isKioskMode) {
     stopAutoScroll();
