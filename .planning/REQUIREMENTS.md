@@ -1,79 +1,79 @@
-# Requirements: Wolfond Chair — Mobile Optimization
+# Requirements: Wolfond Chair Digital Health Report
 
-**Defined:** 2026-03-02
-**Core Value:** The presentation must work smoothly on mobile devices without breaking desktop
+**Defined:** 2026-03-04
+**Core Value:** Polished, hands-free viewing experience on desktop, kiosk, and portrait screens
 
-## v1 Requirements
+## v1.0 Requirements (Complete)
 
-### Mobile CSS
+All v1.0 mobile optimization requirements shipped. See MILESTONES.md for details.
 
-- [x] **MCSS-01**: Slides use viewport height fallback (`100vh` before `100dvh`/`100svh`) for consistent height across all mobile browsers
-- [x] **MCSS-02**: Slides have `touch-action: pan-y` to allow native vertical scrolling while enabling horizontal swipe navigation
-- [x] **MCSS-03**: All interactive elements (nav dots, arrows, buttons) have minimum 44px touch targets
-- [x] **MCSS-04**: Slides use `overscroll-behavior-x: contain` to prevent accidental browser back/forward on horizontal swipe
+## v1.1 Requirements
 
-### Mobile JS
+Requirements for kiosk mode milestone. Each maps to roadmap phases.
 
-- [x] **MJS-01**: Swipe detection requires horizontal delta to exceed vertical delta and minimum 40px threshold before triggering slide change
-- [x] **MJS-02**: Touch target detection checks if finger landed inside `.scroll-content` element before suppressing vertical swipe
-- [x] **MJS-03**: Auto-advance timer pauses when browser tab is hidden (Page Visibility API) and resumes when visible
+### Kiosk Playback
 
-### E2E Testing
+- [ ] **KIOSK-01**: User can press a key to enter kiosk mode (starts auto-advance, hides nav chrome)
+- [ ] **KIOSK-02**: Presentation loops from last slide back to slide 1 in kiosk mode
+- [ ] **KIOSK-03**: User can press a key to exit kiosk mode (restores nav, stops auto-advance)
+- [ ] **KIOSK-04**: Kiosk mode hides dots, arrows, counter, and progress bar
 
-- [x] **TEST-01**: Playwright project configured with webServer serving static HTML, running on desktop Chromium
-- [x] **TEST-02**: Navigation tests verify keyboard arrows, click dots, and click arrows advance/retreat slides correctly
-- [x] **TEST-03**: Mobile viewport tests verify layout on iPhone 14 and Pixel 5 device emulation
-- [x] **TEST-04**: Video modal tests verify open, close, and Escape key dismissal
-- [x] **TEST-05**: Desktop regression tests confirm all navigation and layout still works after mobile changes
+### Auto-Scroll
 
-## v2 Requirements
+- [ ] **SCROLL-01**: Each slide auto-scrolls from top to bottom over the 2-minute interval
+- [ ] **SCROLL-02**: Scroll speed adapts to content height vs viewport height (short slides don't scroll)
+- [ ] **SCROLL-03**: Auto-scroll resets to top when advancing to next slide
+- [ ] **SCROLL-04**: Auto-scroll pauses/resumes correctly with kiosk mode state
 
-### UX Enhancements
+### Portrait Display
 
-- **UX-01**: Visible auto-advance play/pause toggle button
-- **UX-02**: Safe-area inset handling for notched devices (iPhone X+)
-- **UX-03**: Clock-mocked auto-advance timer E2E test
-- **UX-04**: Visual snapshot regression tests across viewports
+- [ ] **PORT-01**: User can press a key to toggle portrait mode on any screen
+- [ ] **PORT-02**: Portrait mode rotates content 90° via CSS transform or iframe wrapper
+- [ ] **PORT-03**: Portrait mode scales content to fill the rotated viewport
+- [ ] **PORT-04**: Portrait mode works in combination with kiosk mode
 
-### Advanced Testing
+## Future Requirements
 
-- **ATEST-01**: Simulated touch swipe E2E tests (touchstart/touchmove/touchend dispatch)
-- **ATEST-02**: CI pipeline integration with GitHub Actions
+### Kiosk Management
+
+- **KMGMT-01**: Remote kiosk control via URL parameters
+- **KMGMT-02**: Scheduled kiosk start/stop times
+- **KMGMT-03**: Multiple presentation playlist support
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Multi-file refactor | Architecture constraint — keep monolithic HTML |
-| Build system (webpack, Vite) | Zero-build static site constraint |
-| Framework migration | Vanilla JS only constraint |
-| New slide content | This milestone is optimization, not content |
-| Full accessibility overhaul | Only fix mobile-impacting a11y issues |
-| Haptic feedback on swipe | Poor cross-browser support, not worth complexity |
-| Real iOS device testing automation | Requires physical devices or BrowserStack; manual smoke test suffices |
+| Remote control / network management | Complexity; not needed for single-screen kiosk |
+| Electron or native app wrapper | Browser-only per constraints |
+| Multi-file refactor | Keep monolithic HTML structure |
+| Build system | Zero-build static HTML |
+| New slide content | Kiosk features only |
 
 ## Traceability
 
+Which phases cover which requirements. Updated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MCSS-01 | Phase 1 | Complete |
-| MCSS-02 | Phase 1 | Complete |
-| MCSS-03 | Phase 1 | Complete |
-| MCSS-04 | Phase 1 | Complete |
-| MJS-01 | Phase 1 | Complete |
-| MJS-02 | Phase 1 | Complete |
-| MJS-03 | Phase 1 | Complete |
-| TEST-01 | Phase 2 | Complete |
-| TEST-02 | Phase 2 | Complete |
-| TEST-03 | Phase 2 | Complete |
-| TEST-04 | Phase 2 | Complete |
-| TEST-05 | Phase 2 | Complete |
+| KIOSK-01 | — | Pending |
+| KIOSK-02 | — | Pending |
+| KIOSK-03 | — | Pending |
+| KIOSK-04 | — | Pending |
+| SCROLL-01 | — | Pending |
+| SCROLL-02 | — | Pending |
+| SCROLL-03 | — | Pending |
+| SCROLL-04 | — | Pending |
+| PORT-01 | — | Pending |
+| PORT-02 | — | Pending |
+| PORT-03 | — | Pending |
+| PORT-04 | — | Pending |
 
 **Coverage:**
-- v1 requirements: 12 total
-- Mapped to phases: 12
-- Unmapped: 0
+- v1.1 requirements: 12 total
+- Mapped to phases: 0
+- Unmapped: 12 ⚠️
 
 ---
-*Requirements defined: 2026-03-02*
-*Last updated: 2026-03-03 after 02-03 completion (TEST-03, TEST-04 marked complete)*
+*Requirements defined: 2026-03-04*
+*Last updated: 2026-03-04 after initial definition*
