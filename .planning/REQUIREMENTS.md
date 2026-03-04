@@ -56,24 +56,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| KIOSK-01 | — | Pending |
-| KIOSK-02 | — | Pending |
-| KIOSK-03 | — | Pending |
-| KIOSK-04 | — | Pending |
-| SCROLL-01 | — | Pending |
-| SCROLL-02 | — | Pending |
-| SCROLL-03 | — | Pending |
-| SCROLL-04 | — | Pending |
-| PORT-01 | — | Pending |
-| PORT-02 | — | Pending |
-| PORT-03 | — | Pending |
-| PORT-04 | — | Pending |
+| KIOSK-01 | Phase 3 | Pending |
+| KIOSK-02 | Phase 3 | Pending |
+| KIOSK-03 | Phase 3 | Pending |
+| KIOSK-04 | Phase 3 | Pending |
+| SCROLL-01 | Phase 4 | Pending |
+| SCROLL-02 | Phase 4 | Pending |
+| SCROLL-03 | Phase 4 | Pending |
+| SCROLL-04 | Phase 4 | Pending |
+| PORT-01 | Phase 5 | Pending |
+| PORT-02 | Phase 5 | Pending |
+| PORT-03 | Phase 5 | Pending |
+| PORT-04 | Phase 5 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12 ⚠️
+- Mapped to phases: 12
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-04*
-*Last updated: 2026-03-04 after initial definition*
+*Last updated: 2026-03-04 — traceability complete after roadmap creation*

@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Kiosk Mode
-status: defining_requirements
+status: roadmap_complete
 last_updated: "2026-03-04"
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -18,14 +18,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Polished, hands-free viewing experience on desktop, kiosk, and portrait screens
-**Current focus:** Defining requirements for v1.1
+**Current focus:** Phase 3 — Kiosk Mode Core
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+```
+[Phase 3] Kiosk Mode Core    [ ] Not started
+[Phase 4] Slow Auto-Scroll   [ ] Not started
+[Phase 5] Portrait Display   [ ] Not started
+
+Progress: 0/3 phases complete
+```
+
+Phase: 3 (Kiosk Mode Core) — ready to plan
 Plan: —
-Status: Defining requirements
-Last activity: 2026-03-04 — Milestone v1.1 started
+Status: Roadmap complete, awaiting plan-phase
+Last activity: 2026-03-04 — Roadmap created for v1.1
 
 ## Performance Metrics
 
@@ -42,10 +50,13 @@ Last activity: 2026-03-04 — Milestone v1.1 started
 - [v1.0]: Use `touch-action: pan-y` as primary swipe discrimination mechanism
 - [v1.0]: `autoTimerPaused` flag distinguishes system-pause from user stop
 - [v1.0]: python3 http.server as static server for Playwright tests
+- [v1.1]: Kiosk mode loops continuously (unattended display should never stop)
+- [v1.1]: Portrait mode via CSS transform or iframe wrapper — no OS-level rotation
+- [v1.1]: Manual keystroke toggle for portrait mode on any screen
 
 ### Pending Todos
 
-None yet.
+- Run `/gsd:plan-phase 3` to begin Kiosk Mode Core implementation
 
 ### Blockers/Concerns
 
@@ -54,5 +65,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Milestone v1.1 initialization
-Resume file: None
+Stopped at: Roadmap created — ready to plan Phase 3
+Resume file: .planning/ROADMAP.md
