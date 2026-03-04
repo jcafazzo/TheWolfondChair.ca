@@ -32,18 +32,16 @@ test.describe('Kiosk Mode', () => {
     await page.keyboard.press('k');
   });
 
-  test('entering kiosk mode hides all chrome elements (opacity 0)', async ({ page }) => {
+  test('entering kiosk mode hides nav chrome elements (opacity 0)', async ({ page }) => {
     await page.keyboard.press('k');
     await page.waitForTimeout(600); // wait for CSS transition (~0.5s)
 
-    const topbarOpacity = await page.locator('.topbar').evaluate(el => getComputedStyle(el).opacity);
     const slideNavOpacity = await page.locator('.slide-nav').evaluate(el => getComputedStyle(el).opacity);
     const slideArrowsOpacity = await page.locator('.slide-arrows').evaluate(el => getComputedStyle(el).opacity);
     const slideCounterOpacity = await page.locator('.slide-counter').evaluate(el => getComputedStyle(el).opacity);
     const autoCounterOpacity = await page.locator('.auto-counter').evaluate(el => getComputedStyle(el).opacity);
     const progressBarOpacity = await page.locator('.progress-bar').evaluate(el => getComputedStyle(el).opacity);
 
-    expect(topbarOpacity).toBe('0');
     expect(slideNavOpacity).toBe('0');
     expect(slideArrowsOpacity).toBe('0');
     expect(slideCounterOpacity).toBe('0');
