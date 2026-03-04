@@ -55,7 +55,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. In kiosk mode, after slide 17 the presentation automatically advances to slide 1 and continues looping without stopping
   3. Pressing the designated key while in kiosk mode exits it — navigation chrome reappears and auto-advance stops
   4. Normal keyboard, dot, and arrow navigation works exactly as before when kiosk mode is off
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 03-01-PLAN.md — Kiosk mode toggle with chrome hiding, event suppression, and E2E tests
 
 ### Phase 4: Slow Auto-Scroll
 **Goal**: Each slide's content scrolls smoothly from top to bottom during its 2-minute kiosk interval, adapting to actual content height
@@ -88,6 +90,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Mobile Fixes | 3/3 | Complete | 2026-03-02 |
 | 2. Playwright Tests | 3/3 | Complete | 2026-03-03 |
-| 3. Kiosk Mode Core | 0/? | Not started | - |
+| 3. Kiosk Mode Core | 0/1 | Planning complete | - |
 | 4. Slow Auto-Scroll | 0/? | Not started | - |
 | 5. Portrait Display | 0/? | Not started | - |
