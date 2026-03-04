@@ -165,14 +165,14 @@ body[data-kiosk] .topbar-logo {
   pointer-events: none;
 }
 body[data-kiosk] .topbar {
-  background: linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 60%, transparent 100%);
+  background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 60%, transparent 100%);
   padding-bottom: 3rem;
 }
 body[data-kiosk] .topbar-domain {
   opacity: 0; pointer-events: none;
 }
 body[data-kiosk][data-nav-theme="dark"] .topbar {
-  background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
+  background: linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.75) 60%, transparent 100%);
 }
 body[data-kiosk] {
   cursor: none;
@@ -187,6 +187,10 @@ body[data-kiosk] .slide {
 /* ═══ Kiosk: vertically center content on short slides ═══ */
 body[data-kiosk] .slide.kiosk-short {
   align-items: center;
+  justify-content: center;
+}
+body[data-kiosk] .slide.kiosk-short .slide-inner {
+  min-height: auto;
 }
 body[data-kiosk] .slide::-webkit-scrollbar { display: none; }
 
@@ -1326,9 +1330,12 @@ function startAutoScroll() {
     autoScrollStartTime = performance.now();
     autoScrollRAF = requestAnimationFrame(autoScrollTick);
   } else {
-    // Short slide — Ken Burns zoom + vertical centering
+    // Short slide — vertical centering
     slideEl.classList.add('kiosk-short');
-    startKenBurns(slideEl);
+    // Ken Burns zoom only on title (slide 0) and thank-you (last slide)
+    if (current === 0 || current === slides.length - 1) {
+      startKenBurns(slideEl);
+    }
   }
 }
 
@@ -1346,8 +1353,8 @@ function autoScrollTick(timestamp) {
   var slideEl = slides[current];
   var scrollableDistance = slideEl.scrollHeight - slideEl.clientHeight;
   if (scrollableDistance <= 0) { autoScrollActive = false; return; }
-  // Use minimum speed of 15px/sec so scroll is clearly visible
-  var MIN_PX_PER_SEC = 15;
+  // Use minimum speed of 12px/sec so scroll is clearly visible
+  var MIN_PX_PER_SEC = 12;
   var timeBudget = (getSlideDuration() * 1000) - SCROLL_PAUSE_MS - 2000;
   if (timeBudget <= 0) timeBudget = 1000;
   var minSpeedDuration = (scrollableDistance / MIN_PX_PER_SEC) * 1000;
