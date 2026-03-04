@@ -1,100 +1,92 @@
 # Technology Stack
 
-**Analysis Date:** 2026-03-02
+**Analysis Date:** 2026-03-04
 
 ## Languages
 
 **Primary:**
-- HTML5 - Page markup and content structure for single-page presentation
-- CSS3 - Styling, animations, and responsive layout
-- JavaScript (Vanilla) - Slide deck logic, interactivity, and dynamic content
+- HTML5 - Main presentation markup
+- CSS3 - All styling, animations, and responsive design
+- JavaScript (ES6+) - Client-side interactivity and slide navigation
+- TypeScript - Test files and development tools
 
 **Secondary:**
-- Markdown - Documentation and configuration files (e.g., `.gitignore`)
+- Python3 - HTTP server for local development
 
 ## Runtime
 
 **Environment:**
-- Browser-based (no server runtime)
-- Static site hosted on GitHub Pages
+- Node.js 18+ - Required for running tests
 
 **Package Manager:**
-- Not applicable (no npm/yarn/pip dependencies)
-- No package.json or lock files present
+- npm 10+ (with lockfile `package-lock.json`)
+- Lockfile: Present and up-to-date
 
 ## Frameworks
 
 **Core:**
-- None - Pure vanilla HTML/CSS/JavaScript (no frameworks like React, Vue, or Angular)
+- HTML/CSS/JavaScript (vanilla) - No frontend framework; static presentation site
+- Vimeo Player API - Embedded video playback in modal and background videos
+
+**Testing:**
+- Playwright 1.58.2 - E2E and visual regression testing framework
+- @playwright/test 1.58.2 - Test runner and assertion library
 
 **Build/Dev:**
-- GitHub Pages - Static site hosting
-- No build tools (no webpack, Vite, esbuild, etc.)
+- Playwright Test Runner - Executes tests with multi-browser support
+- Python3 `http.server` - Development web server (served on port 8080)
 
 ## Key Dependencies
 
-**External Scripts:**
-- None embedded as npm packages
+**Critical:**
+- `@playwright/test` 1.58.2 - Essential for E2E testing across desktop and mobile viewports
+- `playwright` 1.58.2 - Core Playwright automation and browser orchestration
 
-**Fonts:**
-- Google Fonts (Playfair Display, Inter) - Loaded via CDN
-  - Font URLs: `https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&family=Inter:wght@300;400;500;600&display=swap`
-
-**Media:**
-- Vimeo embeds for video playback
-  - Player URLs: `https://player.vimeo.com/video/*`
-  - Videos embedded in iframes with autoplay, mute, and loop parameters
-
-**Image Assets:**
-- Local images stored in `/images` directory (27 images including photos of team members and partners)
-- Hosted images loaded from external CDN: `images.squarespace-cdn.com` (legacy references)
-- Image formats: JPEG, PNG, WebP
+**Infrastructure:**
+- `playwright-core` 1.58.2 - Low-level browser control (transitively required)
+- `fsevents` 2.3.2 - Optional macOS file system watching for test watcher mode
 
 ## Configuration
 
 **Environment:**
-- Static site - no environment variables or secrets required
-- Domain: `thewolfondchair.ca` (configured in CNAME file)
+- No .env file required - Project has no environment variables or secrets
+- `CI` environment variable - When set, disables reusing existing test server (via `process.env.CI` in `playwright.config.ts`)
+- Development server auto-runs via Playwright unless `CI=true`
 
 **Build:**
-- GitHub Pages automatic build and deployment
-- Direct HTML file serving (no build step)
+- `playwright.config.ts` - Test configuration file at project root
+  - Test directory: `./tests`
+  - Test reporters: HTML and list format
+  - Workers: 1 (sequential execution)
+  - Retries: 0 per test
+  - Base URL: `http://localhost:8080/wolfond-report-2024-2026.html`
 
 ## Platform Requirements
 
 **Development:**
-- Text editor (no IDE or build tools required)
-- Git for version control
-- Web browser for testing
+- Node.js 18 or higher
+- npm 10+
+- Python 3 (for development server)
+- OS: macOS, Linux, or Windows with Playwright support
 
 **Production:**
-- GitHub Pages hosting
-- Static HTTP(S) server
-- CDN for external resources (Google Fonts, Vimeo, Squarespace CDN)
+- Static web server (any HTTP server)
+- Deployment target: Any static hosting (GitHub Pages, Vercel, Netlify, traditional web hosting)
+- Browser requirements: Modern browsers with HTML5, CSS3, ES6+ JavaScript support
 
-## Deployment
+## Project Type
 
-**Hosting Platform:**
-- GitHub Pages
-- DNS: CNAME points to `thewolfondchair.ca`
-- No CI/CD pipeline configured
-- Direct push to main branch triggers automatic deployment
+**Architecture:**
+- Single-page presentation application
+- No build step required (vanilla HTML/CSS/JS)
+- No external dependencies in production code
+- Test-driven development with Playwright for regression testing
 
-## Browser Support
-
-**Target Browsers:**
-- Modern browsers supporting:
-  - CSS Grid and Flexbox
-  - CSS custom properties (--variables)
-  - CSS animations and transitions
-  - Fetch API (not used currently)
-  - `100dvh` (dynamic viewport height)
-  - Lazy loading images
-
-**Mobile Support:**
-- Responsive design with media queries at 768px and 900px breakpoints
-- Touch-friendly navigation with larger tap targets
+**Asset Pipeline:**
+- Images stored locally in `/images` directory
+- Embedded assets: One large HTML file (`wolfond-report-2024-2026.html`, 85KB) containing all slides
+- Font delivery: Google Fonts (Playfair Display, Inter) via CDN
 
 ---
 
-*Stack analysis: 2026-03-02*
+*Stack analysis: 2026-03-04*

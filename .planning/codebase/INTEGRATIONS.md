@@ -1,128 +1,140 @@
 # External Integrations
 
-**Analysis Date:** 2026-03-02
+**Analysis Date:** 2026-03-04
 
 ## APIs & External Services
 
-**Content Delivery:**
-- Google Fonts - Typography delivery
-  - Service: Font loading via CDN
-  - URL: `https://fonts.googleapis.com`
-  - Fonts: Playfair Display (serif), Inter (sans-serif)
+**Video Hosting:**
+- Vimeo - Video embedding and playback
+  - SDK/Client: Vimeo Player (iframe embeds)
+  - Integration: `https://player.vimeo.com/video/{videoId}`
+  - Usage: Background videos in slides and modal video player
+  - Test evidence: `tests/video-modal.spec.ts` validates Vimeo embed loading
 
-**Video Hosting & Playback:**
-- Vimeo - Video player embeds
-  - Service: Video hosting and streaming
-  - Implementation: Iframe embeds with player URLs
-  - Video IDs referenced in code:
-    - `1169720277` - CDTX Media video
-    - `1169720780` - CHIN Media video (with text track)
-  - Player parameters: `background=1`, `autoplay=1`, `muted=1`, `loop=1`, `texttrack=en`
-  - Dynamic control: Videos autoplay when Media slide (index 12) is active, stop when navigating away
+**Content Distribution:**
+- Squarespace CDN (images.squarespace-cdn.com) - Image hosting and optimization
+  - All profile images and team photos served from Squarespace CDN
+  - URLs pattern: `https://images.squarespace-cdn.com/content/v1/[path]`
+  - Lazy loading enabled via `loading="lazy"` attribute
+  - Used in: Profile thumbnails, speaker images, institutional photos
+
+**External Links/References:**
+- DOI.org - Digital Object Identifier resolution for academic citations
+  - Integration: `https://doi.org/${p.doi}` for publication links
+  - Usage: Research citations throughout presentation
+
+**News & Media:**
+- CTV News - External news article links
+- Toronto Life - Feature article reference
+- Newswire - Health initiative announcements
+- CanHealth - Medical reporting
+- Ontario Health Association (OHA) - Industry news
+- All linked with `target="_blank"` for new window navigation
 
 ## Data Storage
 
 **Databases:**
-- Not applicable - No database integration
+- Not applicable - Static presentation site with no backend
+- No persistent storage
+- No data models or schemas
 
 **File Storage:**
-- Local filesystem: `/images` directory
-  - Contains 27 static image assets (JPEG, PNG, WebP)
-  - Lazy loading enabled for performance
-
-**Legacy CDN References:**
-- Squarespace CDN: `images.squarespace-cdn.com`
-  - Hosts team member photos and institutional images
-  - URLs embedded in JavaScript constant `TEAM_PHOTOS`
-  - Example: `https://images.squarespace-cdn.com/content/v1/623360bd0806e50fc75a9b9e/...`
+- Local filesystem (development/build): `/images/` directory contains 24 image files (.webp, .jpg, .png)
+  - Images referenced: 23 image assets locally
+  - External CDN: Squarespace CDN hosts some duplicate/additional profile images
+- Production: Static files served via HTTP
 
 **Caching:**
-- Browser caching only (via HTTP cache headers)
-- No service workers or explicit caching strategy
+- HTTP browser caching - Implicit via static HTTP server
+- No explicit caching service or CDN layer beyond Squarespace CDN
 
 ## Authentication & Identity
 
 **Auth Provider:**
-- None - Static public site, no authentication required
+- Custom or none - Static presentation has no authentication
+- No user login required
+- No authorization checks
 
 ## Monitoring & Observability
 
 **Error Tracking:**
-- Not integrated
+- Not integrated - Static presentation site
 
 **Logs:**
-- Browser console only (no centralized logging)
+- Browser console - Standard JavaScript logging (no external service)
+- Test output - Playwright reporters only (HTML and list format in `playwright-report/`)
+- Development server logs - Python http.server stdout/stderr (stderr captured in tests)
 
-**Analytics:**
-- Not detected (no Google Analytics, Mixpanel, or similar tracking)
+**Trace Collection:**
+- Playwright trace collection enabled: `trace: 'on-first-retry'` in `playwright.config.ts`
+- Traces stored in `playwright-report/` after test failures
 
 ## CI/CD & Deployment
 
 **Hosting:**
-- GitHub Pages (automatic deployment from main branch)
+- GitHub Pages (inferred from repository URL and CNAME file)
+- Traditional static web hosting compatible
 
 **CI Pipeline:**
-- None configured - Direct static file serving
+- GitHub Actions - Runs on CI when `process.env.CI` is set
+- Playwright test configuration respects CI environment:
+  - Non-CI: Reuses existing server via `reuseExistingServer: true`
+  - CI: Creates fresh server on each run via `reuseExistingServer: !process.env.CI`
+- No explicit deploy configuration detected
 
-**Domain Management:**
-- CNAME file: Points to `thewolfondchair.ca`
+**Test Automation:**
+- Playwright test runner orchestrates testing
+- Multi-browser testing via project configurations:
+  - Desktop Chrome (1280x800)
+  - Mobile iPhone 14
+  - Mobile Pixel 5
+- Reporter: HTML report (open: 'never'), list reporter for CI
 
 ## Environment Configuration
 
 **Required env vars:**
-- None - No server-side environment configuration
+- `CI` - Optional flag to disable server reuse in test environment
 
 **Secrets location:**
-- Not applicable - No secrets or credentials
+- No secrets required - Static presentation
+- No `.env` file needed
+- Repository public (GitHub-hosted, CNAME pointing to custom domain)
 
-## External Image References
+## Font Delivery
 
-**Team Member Photos (Squarespace CDN):**
-The following team members have photos hosted on external CDN:
-- Dr. Joseph Cafazzo
-- Dr. Quynh Pham
-- Antonia Barbaric
-- Ken Christofferson
-- Pedro Velmovitsky
-- Ting Xiong
-- Camila Benmessaoud
-- Karan Dave
-- Ian Connell
-- Kevin Tallevi
-
-**Institutional Images (Squarespace CDN):**
-- UHN (University Health Network) building image
-- Campus image from Unsplash
+**Google Fonts:**
+- Playfair Display (serif) - Weights 400, 500, 600, 700, 800 + italics
+- Inter (sans-serif) - Weights 300, 400, 500, 600
+- Preconnect: `<link rel="preconnect" href="https://fonts.googleapis.com">`
+- CSS load: Via Google Fonts stylesheet
 
 ## Webhooks & Callbacks
 
 **Incoming:**
-- Not applicable
+- None - Static presentation
 
 **Outgoing:**
-- Not applicable
+- None - No external API calls from application code
+- External links are user-initiated clicks (not programmatic callbacks)
 
-## API Integrations Summary
+## Video Content
 
-**Read-Only Operations:**
-1. Google Fonts API - Font file delivery
-2. Vimeo Player API - Video iframe embedding and control
-3. Image CDN - Asset serving from Squarespace
+**Video Embedding:**
+- Vimeo IDs referenced:
+  - 1169716954 - Background video (main)
+  - 1169720277 - Background video (alternate)
+  - 1169720780 - Background video with captions
+  - 1169672887 - Video modal examples (test fixture)
+  - Dynamic video IDs stored in JSON data structure within HTML
+- Embedding method: Iframe with parameters (autoplay, muted, loop, badge disabled, DNT)
+- Modal implementation: Custom `openVideoModal()` and `closeVideoModal()` JavaScript functions
 
-**No Write Operations:**
-- Site is fully static with no server-side data persistence or external API calls
+## Link References
 
-## Performance Considerations
-
-**External Dependencies:**
-- Google Fonts: Preconnected via `<link rel="preconnect" href="https://fonts.googleapis.com">`
-- Vimeo iframes: Dynamically loaded and unloaded based on slide navigation
-- CDN images: Lazy loaded with `loading="lazy"` attribute
-
-**Fallback Strategy:**
-- Local images in `/images` directory serve as fallback for Squarespace CDN references
-- Core functionality works without external CDN if needed (can be updated to use local images)
+**Internal Cross-Links:**
+- None within presentation (single-page app)
+- All external links point to partner organizations, news outlets, and research sites
 
 ---
 
-*Integration audit: 2026-03-02*
+*Integration audit: 2026-03-04*
