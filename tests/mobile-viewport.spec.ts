@@ -44,7 +44,7 @@ test.describe('Mobile viewport', () => {
     expect(box!.width).toBeLessThanOrEqual(viewport.width + 1); // 1px tolerance
   });
 
-  test('content-heavy slide uses body scroll (no embedded scroll-content overflow)', async ({ page }) => {
+  test('content-heavy slide has no embedded scroll-content overflow (single slide scroll)', async ({ page }) => {
     const scrollSlideIndex = await page.evaluate(() => {
       const slides = document.querySelectorAll('.slide');
       for (let i = 0; i < slides.length; i++) {

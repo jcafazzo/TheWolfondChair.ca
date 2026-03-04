@@ -38,19 +38,19 @@ body {
 a { color: var(--black); }
 
 /* ═══ Slide deck ═══ */
-.deck { min-height: 100vh; min-height: 100svh; overflow: visible; position: relative; }
+.deck { height: 100vh; height: 100svh; overflow: hidden; position: relative; }
 
 .slide {
   position: absolute; inset: 0;
   display: flex; align-items: flex-start; justify-content: center;
   opacity: 0; transform: translateY(40px);
   transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none; overflow: visible;
+  pointer-events: none; overflow-y: auto; overflow-x: hidden;
   touch-action: pan-y;
   overscroll-behavior-x: contain;
   -webkit-tap-highlight-color: transparent;
 }
-.slide.active { position: relative; width: 100%; opacity: 1; transform: translateY(0); pointer-events: auto; z-index: 2; }
+.slide.active { opacity: 1; transform: translateY(0); pointer-events: auto; z-index: 2; }
 .slide.exiting { opacity: 0; transform: translateY(-30px); pointer-events: none; z-index: 1; }
 
 /* Staggered entrance for child elements */
@@ -177,14 +177,13 @@ body[data-kiosk][data-nav-theme="dark"] .topbar {
 body[data-kiosk] {
   cursor: none;
 }
-/* ═══ Kiosk auto-scroll: hide scrollbars, body scrolls ═══ */
-body[data-kiosk] {
+/* ═══ Kiosk auto-scroll: hide scrollbars on slides ═══ */
+body[data-kiosk] .slide {
   scrollbar-width: none;
 }
-body[data-kiosk]::-webkit-scrollbar { display: none; }
+body[data-kiosk] .slide::-webkit-scrollbar { display: none; }
 /* ═══ Kiosk: vertically center content on short slides ═══ */
 body[data-kiosk] .slide.kiosk-short {
-  min-height: 100vh; min-height: 100svh;
   align-items: center;
   justify-content: center;
 }
@@ -1318,12 +1317,11 @@ function startAutoScroll() {
   stopAutoScroll();
   var slideEl = slides[current];
   if (!slideEl) return;
-  // Scrollable distance = how far the page can scroll (body scroll, not embedded)
-  var scrollableDistance = document.documentElement.scrollHeight - window.innerHeight;
-  if (scrollableDistance > 10) {
-    // Tall slide — auto-scroll window from top to bottom
+  // Check if slide has scrollable content (single unified scroll, no embedded areas)
+  if (slideEl.scrollHeight - slideEl.clientHeight > 10) {
+    // Tall slide — auto-scroll from top to bottom
     slideEl.classList.remove('kiosk-short');
-    window.scrollTo(0, 0);
+    slideEl.scrollTop = 0;
     autoScrollActive = true;
     autoScrollPaused = true;
     autoScrollStartTime = performance.now();
@@ -1349,7 +1347,8 @@ function autoScrollTick(timestamp) {
       return;
     }
   }
-  var scrollableDistance = document.documentElement.scrollHeight - window.innerHeight;
+  var slideEl = slides[current];
+  var scrollableDistance = slideEl.scrollHeight - slideEl.clientHeight;
   if (scrollableDistance <= 0) { autoScrollActive = false; return; }
   // Use minimum speed of 12px/sec so scroll is clearly visible
   var MIN_PX_PER_SEC = 12;
@@ -1359,7 +1358,7 @@ function autoScrollTick(timestamp) {
   var duration = Math.min(timeBudget, minSpeedDuration);
   var elapsed = timestamp - autoScrollStartTime;
   var progress = Math.min(elapsed / duration, 1.0);
-  window.scrollTo(0, progress * scrollableDistance);
+  slideEl.scrollTop = progress * scrollableDistance;
   if (progress < 1.0) {
     autoScrollRAF = requestAnimationFrame(autoScrollTick);
   } else {
@@ -1374,7 +1373,7 @@ function stopAutoScroll() {
 }
 
 function resetSlideScroll(slideEl) {
-  window.scrollTo(0, 0);
+  slideEl.scrollTop = 0;
   slideEl.style.transform = '';
   slideEl.style.transformOrigin = '';
   slideEl.classList.remove('kiosk-short');
@@ -1466,23 +1465,12 @@ function goToSlide(index) {
   isTransitioning = true;
   const prev = slides[current];
   const next = slides[index];
-  // Scroll window to top before transition
-  window.scrollTo(0, 0);
   prev.classList.remove('active');
   prev.classList.add('exiting');
-  // Keep incoming slide absolute during transition to prevent layout shift
-  next.style.position = 'absolute';
-  next.style.inset = '0';
   next.classList.add('active');
-  setTimeout(() => {
-    prev.classList.remove('exiting');
-    // Now let active slide become relative (in-flow) for body scroll
-    next.style.position = '';
-    next.style.inset = '';
-    isTransitioning = false;
-  }, 800);
+  setTimeout(() => { prev.classList.remove('exiting'); isTransitioning = false; }, 800);
   current = index;
-  // Reset previous slide and stop auto-scroll
+  // Reset previous slide scroll position and stop auto-scroll
   resetSlideScroll(prev);
   if (isKioskMode) {
     stopAutoScroll();

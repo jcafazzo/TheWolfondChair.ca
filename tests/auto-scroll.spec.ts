@@ -57,51 +57,54 @@ test.describe('Auto-Scroll', () => {
     expect(rafAfter).toBe(null);
   });
 
-  test('tall slide scrolls window down during kiosk mode', async ({ page }) => {
-    // Find a tall slide by navigating to each and checking if page scrolls
-    const totalSlides = await page.evaluate(() => (window as any).slides.length);
-    let tallIdx = -1;
-
-    for (let i = 1; i < totalSlides; i++) {
-      await page.evaluate((idx: number) => (window as any).goToSlide(idx), i);
-      await page.waitForTimeout(900); // wait for transition (800ms + buffer)
-      const scrollable = await page.evaluate(() =>
-        document.documentElement.scrollHeight - window.innerHeight
-      );
-      if (scrollable > 10) {
-        tallIdx = i;
-        break;
+  test('tall slide scrolls during kiosk mode', async ({ page }) => {
+    // Find a tall slide (scrollHeight > clientHeight)
+    const tallIdx = await page.evaluate(() => {
+      const win = window as any;
+      for (let i = 1; i < win.slides.length; i++) {
+        const el = win.slides[i] as HTMLElement;
+        if (el.scrollHeight - el.clientHeight > 10) return i;
       }
-    }
+      return -1;
+    });
 
     if (tallIdx === -1) {
       test.skip();
       return;
     }
 
-    // Enter kiosk mode on the tall slide
+    // Navigate to the tall slide
+    await page.evaluate((idx: number) => (window as any).goToSlide(idx), tallIdx);
+    await page.waitForTimeout(850);
+
+    // Enter kiosk mode
     await page.keyboard.press('k');
-    // Wait for scrolling (no pause, just 3s of scroll at 12px/sec)
+    // Wait for scrolling (no pause, 3s of scroll at 12px/sec)
     await page.waitForTimeout(3500);
 
-    const scrollY = await page.evaluate(() => window.scrollY);
-    expect(scrollY).toBeGreaterThan(0);
+    const scrollTop = await page.evaluate((idx: number) => {
+      return (window as any).slides[idx].scrollTop;
+    }, tallIdx);
+
+    expect(scrollTop).toBeGreaterThan(0);
 
     // Exit kiosk mode
     await page.keyboard.press('k');
   });
 
-  test('short slide does not scroll window - gets Ken Burns zoom instead', async ({ page }) => {
+  test('short slide does not scroll - gets Ken Burns zoom instead', async ({ page }) => {
     // Slide 0 (cover) is short — no overflow
     expect(await getCurrentSlideIndex(page)).toBe(0);
 
     // Enter kiosk mode
     await page.keyboard.press('k');
-    // Wait for Ken Burns zoom to start
+    // Wait for zoom to start (no pause)
     await page.waitForTimeout(2000);
 
-    const scrollY = await page.evaluate(() => window.scrollY);
-    expect(scrollY).toBe(0);
+    const scrollTop = await page.evaluate(() => {
+      return (window as any).slides[0].scrollTop;
+    });
+    expect(scrollTop).toBe(0);
 
     const transform = await page.evaluate(() => {
       return (window as any).slides[0].style.transform;
@@ -112,42 +115,45 @@ test.describe('Auto-Scroll', () => {
     await page.keyboard.press('k');
   });
 
-  test('window scroll resets to top on slide advance', async ({ page }) => {
+  test('slide scroll position resets to top on advance', async ({ page }) => {
     // Find a tall slide
-    const totalSlides = await page.evaluate(() => (window as any).slides.length);
-    let tallIdx = -1;
-
-    for (let i = 1; i < totalSlides - 1; i++) {
-      await page.evaluate((idx: number) => (window as any).goToSlide(idx), i);
-      await page.waitForTimeout(900);
-      const scrollable = await page.evaluate(() =>
-        document.documentElement.scrollHeight - window.innerHeight
-      );
-      if (scrollable > 10) {
-        tallIdx = i;
-        break;
+    const tallIdx = await page.evaluate(() => {
+      const win = window as any;
+      for (let i = 1; i < win.slides.length - 1; i++) {
+        const el = win.slides[i] as HTMLElement;
+        if (el.scrollHeight - el.clientHeight > 10) return i;
       }
-    }
+      return -1;
+    });
 
     if (tallIdx === -1) {
       test.skip();
       return;
     }
 
-    // Enter kiosk and wait for scrolling
+    // Navigate to tall slide
+    await page.evaluate((idx: number) => (window as any).goToSlide(idx), tallIdx);
+    await page.waitForTimeout(850);
+
+    // Enter kiosk
     await page.keyboard.press('k');
+    // Wait for scrolling
     await page.waitForTimeout(3500);
 
-    // Verify window has scrolled
-    const scrollBefore = await page.evaluate(() => window.scrollY);
+    // Verify scrollTop > 0 on tall slide
+    const scrollBefore = await page.evaluate((idx: number) => {
+      return (window as any).slides[idx].scrollTop;
+    }, tallIdx);
     expect(scrollBefore).toBeGreaterThan(0);
 
     // Advance to next slide
     await page.evaluate((idx: number) => (window as any).goToSlide(idx + 1), tallIdx);
-    await page.waitForTimeout(900);
+    await page.waitForTimeout(850);
 
-    // Window scroll should reset to 0
-    const scrollAfter = await page.evaluate(() => window.scrollY);
+    // Previous slide should have scrollTop reset to 0
+    const scrollAfter = await page.evaluate((idx: number) => {
+      return (window as any).slides[idx].scrollTop;
+    }, tallIdx);
     expect(scrollAfter).toBe(0);
 
     // Exit kiosk mode
@@ -194,7 +200,7 @@ test.describe('Auto-Scroll', () => {
 
     // Enter kiosk
     await page.keyboard.press('k');
-    // Wait for zoom to start (no pause)
+    // Wait for zoom (no pause)
     await page.waitForTimeout(2000);
 
     // Verify zoom is applied
@@ -231,5 +237,17 @@ test.describe('Auto-Scroll', () => {
 
     // Exit kiosk mode to clean up
     await page.keyboard.press('k');
+  });
+
+  test('scroll-content has no embedded scroll (overflow visible)', async ({ page }) => {
+    const overflowY = await page.evaluate(() => {
+      const el = document.querySelector('.scroll-content');
+      return el ? getComputedStyle(el).overflowY : null;
+    });
+    if (overflowY === null) {
+      test.skip();
+      return;
+    }
+    expect(overflowY).toBe('visible');
   });
 });
