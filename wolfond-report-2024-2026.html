@@ -142,6 +142,29 @@ body { animation: bodyIn 1s ease forwards; }
   .slide-counter { left: 1.5rem; bottom: 1.75rem; }
 }
 
+/* ═══ Kiosk mode: hide all chrome ═══ */
+.topbar,
+.slide-nav,
+.slide-arrows,
+.slide-counter,
+.auto-counter,
+.progress-bar {
+  transition: opacity 0.5s ease;
+}
+body[data-kiosk] .topbar,
+body[data-kiosk] .slide-nav,
+body[data-kiosk] .slide-arrows,
+body[data-kiosk] .slide-counter,
+body[data-kiosk] .auto-counter,
+body[data-kiosk] .progress-bar {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+body[data-kiosk] {
+  cursor: none;
+}
+
 /* ═══ Nav theme: light slides ═══ */
 body[data-nav-theme="light"] .topbar-logo { color: var(--black); }
 body[data-nav-theme="light"] .topbar-domain { color: var(--black); }
@@ -1041,6 +1064,7 @@ function buildSlides() {
 
 // ═══ VIDEO MODAL ═══
 function openVideoModal(vimeoId, caption) {
+  if (isKioskMode) return; // suppress modals in kiosk
   const modal = document.getElementById('videoModal');
   const frame = document.getElementById('videoModalFrame');
   const cap = document.getElementById('videoModalCaption');
@@ -1170,6 +1194,49 @@ function resetAutoAdvance() {
   startAutoAdvance();
 }
 
+// ═══ KIOSK MODE ═══
+function startCursorHideTimer() {
+  clearCursorHideTimer();
+  cursorHideTimer = setTimeout(() => {
+    if (isKioskMode) document.body.style.cursor = 'none';
+  }, 3000);
+}
+function clearCursorHideTimer() {
+  if (cursorHideTimer) { clearTimeout(cursorHideTimer); cursorHideTimer = null; }
+  document.body.style.cursor = '';
+}
+function enterKiosk() {
+  isKioskMode = true;
+  document.body.setAttribute('data-kiosk', '');
+  startAutoAdvance(); // fresh timer from current slide
+  // Request fullscreen
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+  // Start cursor hide timer
+  startCursorHideTimer();
+}
+function exitKiosk() {
+  isKioskMode = false;
+  document.body.removeAttribute('data-kiosk');
+  stopAutoAdvance();
+  // Exit fullscreen if active
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(() => {});
+  }
+  // Clear cursor hide timer, restore cursor
+  clearCursorHideTimer();
+  // Restart normal auto-advance
+  startAutoAdvance();
+}
+
+document.addEventListener('mousemove', () => {
+  if (isKioskMode) {
+    document.body.style.cursor = '';
+    startCursorHideTimer();
+  }
+});
+
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     // Tab hidden — pause both intervals if running
@@ -1206,9 +1273,11 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // ═══ ENGINE ═══
-let current = 0;
-let slides = [];
-let isTransitioning = false;
+var current = 0;
+var slides = [];
+var isTransitioning = false;
+var isKioskMode = false;
+var cursorHideTimer = null;
 
 function init() {
   const deck = document.getElementById('deck');
@@ -1303,14 +1372,22 @@ function updateCounter() {
   document.getElementById('progressFill').style.width = pct + '%';
 }
 
-// Keyboard — arrow keys only
+// Keyboard — arrow keys only (K key toggles kiosk mode)
 document.addEventListener('keydown', (e) => {
+  if (e.key === 'k' || e.key === 'K') {
+    e.preventDefault();
+    if (isKioskMode) exitKiosk();
+    else enterKiosk();
+    return;
+  }
+  if (isKioskMode) return; // suppress all other keys in kiosk
   if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); }
   else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
 });
 
 // Tap-to-navigate — tap right side to advance, left side to go back
 document.addEventListener('click', (e) => {
+  if (isKioskMode) return; // suppress all clicks in kiosk
   // Ignore clicks on interactive elements
   if (e.target.closest('a, button, input, select, textarea, iframe, .convo-thumb, .scroll-content, .slide-arrow, .slide-dot, .slide-nav, .topbar, .video-modal, .pub-filter, .video-mute-btn, .tl-feature')) return;
   const x = e.clientX;
@@ -1327,6 +1404,7 @@ document.addEventListener('touchstart', (e) => {
   swipeStartY = e.changedTouches[0].clientY;
 }, { passive: true });
 document.addEventListener('touchend', (e) => {
+  if (isKioskMode) return; // suppress all swipes in kiosk
   const dx = e.changedTouches[0].clientX - swipeStartX;
   const dy = e.changedTouches[0].clientY - swipeStartY;
   if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
