@@ -20,10 +20,10 @@ Requirements for kiosk mode milestone. Each maps to roadmap phases.
 
 ### Auto-Scroll
 
-- [ ] **SCROLL-01**: Each slide auto-scrolls from top to bottom over the 2-minute interval
-- [ ] **SCROLL-02**: Scroll speed adapts to content height vs viewport height (short slides don't scroll)
-- [ ] **SCROLL-03**: Auto-scroll resets to top when advancing to next slide
-- [ ] **SCROLL-04**: Auto-scroll pauses/resumes correctly with kiosk mode state
+- [x] **SCROLL-01**: Each slide auto-scrolls from top to bottom over the 2-minute interval
+- [x] **SCROLL-02**: Scroll speed adapts to content height vs viewport height (short slides don't scroll)
+- [x] **SCROLL-03**: Auto-scroll resets to top when advancing to next slide
+- [x] **SCROLL-04**: Auto-scroll pauses/resumes correctly with kiosk mode state
 
 ### Portrait Display
 
@@ -60,10 +60,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KIOSK-02 | Phase 3 | Complete |
 | KIOSK-03 | Phase 3 | Complete |
 | KIOSK-04 | Phase 3 | Complete |
-| SCROLL-01 | Phase 4 | Pending |
-| SCROLL-02 | Phase 4 | Pending |
-| SCROLL-03 | Phase 4 | Pending |
-| SCROLL-04 | Phase 4 | Pending |
+| SCROLL-01 | Phase 4 | Complete |
+| SCROLL-02 | Phase 4 | Complete |
+| SCROLL-03 | Phase 4 | Complete |
+| SCROLL-04 | Phase 4 | Complete |
 | PORT-01 | Phase 5 | Pending |
 | PORT-02 | Phase 5 | Pending |
 | PORT-03 | Phase 5 | Pending |

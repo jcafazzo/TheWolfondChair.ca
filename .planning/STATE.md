@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: verifying
-stopped_at: Phase 4 context gathered
-last_updated: "2026-03-04T17:24:24.548Z"
-last_activity: 2026-03-04 — Kiosk mode implemented, tests passing
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-04T22:00:40.292Z"
+last_activity: 2026-03-04 — Auto-scroll engine complete, ready for Phase 5
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  completed_phases: 4
+  total_plans: 8
+  completed_plans: 8
 ---
 
 # Project State
@@ -20,22 +20,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Polished, hands-free viewing experience on desktop, kiosk, and portrait screens
-**Current focus:** Phase 3 — Kiosk Mode Core
+**Current focus:** Phase 5 — Portrait Display
 
 ## Current Position
 
 ```
-[Phase 3] Kiosk Mode Core    [~] In progress (03-01 Task 1 done, awaiting Task 2 checkpoint)
-[Phase 4] Slow Auto-Scroll   [ ] Not started
+[Phase 3] Kiosk Mode Core    [x] Complete
+[Phase 4] Slow Auto-Scroll   [x] Complete
 [Phase 5] Portrait Display   [ ] Not started
 
-Progress: 0/3 phases complete
+Progress: 2/3 phases complete (v1.1)
 ```
 
-Phase: 3 (Kiosk Mode Core) — plan 01 in progress
-Plan: 03-01 (Task 2 checkpoint:human-verify pending)
-Status: Awaiting human verification of kiosk mode visuals
-Last activity: 2026-03-04 — Kiosk mode implemented, tests passing
+Phase: 4 (Slow Auto-Scroll) — complete
+Plan: 04-01 complete (all 3 tasks + human-verify fixes)
+Status: Ready for Phase 5
+Last activity: 2026-03-04 — Auto-scroll engine with Ken Burns zoom, arrow key kiosk nav
 
 ## Performance Metrics
 
@@ -57,6 +57,8 @@ Last activity: 2026-03-04 — Kiosk mode implemented, tests passing
 - [v1.1]: Manual keystroke toggle for portrait mode on any screen
 - [Phase 03-kiosk-mode-core]: Use var (not let) for isKioskMode and other state variables needing window.xxx access in Playwright tests
 - [Phase 03-kiosk-mode-core]: K key check must be first in keydown handler before all other key logic
+- [Phase 04]: Ken Burns zoom set to 105% (0.05 scale factor) for noticeable visual effect
+- [Phase 04]: Arrow keys allowed in kiosk mode for manual slide navigation during TV presentations
 
 ### Pending Todos
 
@@ -68,6 +70,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-04T17:24:24.545Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-slow-auto-scroll/04-CONTEXT.md
+Last session: 2026-03-04T22:00:40.283Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None
