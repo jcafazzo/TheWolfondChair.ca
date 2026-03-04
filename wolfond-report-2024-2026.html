@@ -151,7 +151,6 @@ body { animation: bodyIn 1s ease forwards; }
 .progress-bar {
   transition: opacity 0.5s ease;
 }
-body[data-kiosk] .topbar,
 body[data-kiosk] .slide-nav,
 body[data-kiosk] .slide-arrows,
 body[data-kiosk] .slide-counter,
@@ -161,9 +160,20 @@ body[data-kiosk] .progress-bar {
   pointer-events: none;
   transition: opacity 0.5s ease;
 }
+body[data-kiosk] .topbar-logo {
+  pointer-events: none;
+}
 body[data-kiosk] {
   cursor: none;
 }
+/* ═══ Kiosk auto-scroll: allow slides to scroll, hide scrollbars ═══ */
+body[data-kiosk] .slide {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: auto;
+  scrollbar-width: none;
+}
+body[data-kiosk] .slide::-webkit-scrollbar { display: none; }
 
 /* ═══ Nav theme: light slides ═══ */
 body[data-nav-theme="light"] .topbar-logo { color: var(--black); }
@@ -1166,9 +1176,15 @@ function updateCounterDisplay() {
   el.textContent = m + ':' + String(s).padStart(2, '0');
 }
 
+function getSlideDuration() {
+  var slideEl = slides[current];
+  var dur = slideEl ? slideEl.getAttribute('data-duration') : null;
+  return dur ? parseInt(dur, 10) : AUTO_SECONDS;
+}
+
 function startAutoAdvance() {
   stopAutoAdvance();
-  secondsLeft = AUTO_SECONDS;
+  secondsLeft = getSlideDuration();
   updateCounterDisplay();
   countdownTimer = setInterval(() => {
     secondsLeft--;
@@ -1182,7 +1198,7 @@ function startAutoAdvance() {
     } else {
       goToSlide(0);
     }
-  }, AUTO_SECONDS * 1000);
+  }, getSlideDuration() * 1000);
 }
 
 function stopAutoAdvance() {
@@ -1209,6 +1225,7 @@ function enterKiosk() {
   isKioskMode = true;
   document.body.setAttribute('data-kiosk', '');
   startAutoAdvance(); // fresh timer from current slide
+  startAutoScroll();
   // Request fullscreen
   if (document.documentElement.requestFullscreen) {
     document.documentElement.requestFullscreen().catch(() => {});
@@ -1220,6 +1237,8 @@ function exitKiosk() {
   isKioskMode = false;
   document.body.removeAttribute('data-kiosk');
   stopAutoAdvance();
+  stopAutoScroll();
+  for (var i = 0; i < slides.length; i++) { resetSlideScroll(slides[i]); }
   // Exit fullscreen if active
   if (document.fullscreenElement) {
     document.exitFullscreen().catch(() => {});
@@ -1272,6 +1291,108 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
+// ═══ AUTO-SCROLL ═══
+var autoScrollRAF = null;      // requestAnimationFrame ID
+var autoScrollActive = false;  // whether auto-scroll loop is running
+var autoScrollStartTime = 0;   // timestamp when scroll began (after initial pause)
+var autoScrollPaused = true;   // true during initial 5s pause
+var SCROLL_PAUSE_MS = 5000;    // 5-second pause at top before scrolling starts
+
+function startAutoScroll() {
+  stopAutoScroll();
+  var slideEl = slides[current];
+  if (!slideEl) return;
+  if (slideEl.scrollHeight > slideEl.clientHeight) {
+    // Tall slide — auto-scroll from top to bottom
+    slideEl.scrollTop = 0;
+    autoScrollActive = true;
+    autoScrollPaused = true;
+    autoScrollStartTime = performance.now();
+    autoScrollRAF = requestAnimationFrame(autoScrollTick);
+  } else {
+    // Short slide — Ken Burns zoom
+    startKenBurns(slideEl);
+  }
+}
+
+function autoScrollTick(timestamp) {
+  if (!autoScrollActive) return;
+  if (autoScrollPaused) {
+    if (timestamp - autoScrollStartTime >= SCROLL_PAUSE_MS) {
+      autoScrollPaused = false;
+      autoScrollStartTime = timestamp;
+    } else {
+      autoScrollRAF = requestAnimationFrame(autoScrollTick);
+      return;
+    }
+  }
+  var slideEl = slides[current];
+  var scrollableDistance = slideEl.scrollHeight - slideEl.clientHeight;
+  if (scrollableDistance <= 0) { autoScrollActive = false; return; }
+  var duration = (getSlideDuration() * 1000) - SCROLL_PAUSE_MS - 2000;
+  if (duration <= 0) duration = 1000;
+  var elapsed = timestamp - autoScrollStartTime;
+  var progress = Math.min(elapsed / duration, 1.0);
+  slideEl.scrollTop = progress * scrollableDistance;
+  if (progress < 1.0) {
+    autoScrollRAF = requestAnimationFrame(autoScrollTick);
+  } else {
+    autoScrollActive = false;
+  }
+}
+
+function stopAutoScroll() {
+  if (autoScrollRAF) { cancelAnimationFrame(autoScrollRAF); autoScrollRAF = null; }
+  autoScrollActive = false;
+  stopKenBurns();
+}
+
+function resetSlideScroll(slideEl) {
+  slideEl.scrollTop = 0;
+  slideEl.style.transform = '';
+  slideEl.style.transformOrigin = '';
+}
+
+function startKenBurns(slideEl) {
+  autoScrollActive = true;
+  autoScrollStartTime = performance.now();
+  autoScrollPaused = true;
+  autoScrollRAF = requestAnimationFrame(kenBurnsTick);
+}
+
+function kenBurnsTick(timestamp) {
+  if (!autoScrollActive) return;
+  if (autoScrollPaused) {
+    if (timestamp - autoScrollStartTime >= SCROLL_PAUSE_MS) {
+      autoScrollPaused = false;
+      autoScrollStartTime = timestamp;
+    } else {
+      autoScrollRAF = requestAnimationFrame(kenBurnsTick);
+      return;
+    }
+  }
+  var slideEl = slides[current];
+  var duration = (getSlideDuration() * 1000) - SCROLL_PAUSE_MS;
+  if (duration <= 0) duration = 1000;
+  var elapsed = timestamp - autoScrollStartTime;
+  var progress = Math.min(elapsed / duration, 1.0);
+  var scale = 1 + (0.02 * progress);
+  slideEl.style.transform = 'scale(' + scale + ')';
+  slideEl.style.transformOrigin = 'center center';
+  if (progress < 1.0) {
+    autoScrollRAF = requestAnimationFrame(kenBurnsTick);
+  } else {
+    autoScrollActive = false;
+  }
+}
+
+function stopKenBurns() {
+  for (var i = 0; i < slides.length; i++) {
+    slides[i].style.transform = '';
+    slides[i].style.transformOrigin = '';
+  }
+}
+
 // ═══ ENGINE ═══
 var current = 0;
 var slides = [];
@@ -1321,6 +1442,12 @@ function goToSlide(index) {
   next.classList.add('active');
   setTimeout(() => { prev.classList.remove('exiting'); isTransitioning = false; }, 800);
   current = index;
+  // Reset previous slide scroll position and stop auto-scroll
+  resetSlideScroll(prev);
+  if (isKioskMode) {
+    stopAutoScroll();
+    setTimeout(function() { if (isKioskMode) startAutoScroll(); }, 850);
+  }
   document.querySelectorAll('.slide-dot').forEach((d, i) => d.classList.toggle('active', i === current));
   applyNavTheme(slides[current]);
   updateCounter();
