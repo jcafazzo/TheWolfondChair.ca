@@ -106,10 +106,10 @@ test.describe('Auto-Scroll', () => {
     });
     expect(scrollTop).toBe(0);
 
-    // Ken Burns now targets the title text element (.t-display), not the whole slide
+    // Ken Burns zooms .slide-inner on the cover slide (cinematic zoom with counter-scaled non-title elements)
     const transform = await page.evaluate(() => {
-      const title = (window as any).slides[0].querySelector('.t-display');
-      return title ? title.style.transform : '';
+      const inner = (window as any).slides[0].querySelector('.slide-inner');
+      return inner ? inner.style.transform : '';
     });
     expect(transform).toContain('scale');
 
@@ -205,10 +205,10 @@ test.describe('Auto-Scroll', () => {
     // Wait for zoom (no pause)
     await page.waitForTimeout(2000);
 
-    // Verify zoom is applied to the title text element
+    // Verify zoom is applied to .slide-inner on the cover slide
     const transformBefore = await page.evaluate(() => {
-      const title = (window as any).slides[0].querySelector('.t-display');
-      return title ? title.style.transform : '';
+      const inner = (window as any).slides[0].querySelector('.slide-inner');
+      return inner ? inner.style.transform : '';
     });
     expect(transformBefore).toContain('scale');
 
@@ -216,10 +216,10 @@ test.describe('Auto-Scroll', () => {
     await page.evaluate(() => (window as any).goToSlide(1));
     await page.waitForTimeout(1050); // 850ms transition + 200ms buffer
 
-    // Slide 0's title transform should be reset
+    // Slide 0's .slide-inner transform should be reset
     const transformAfter = await page.evaluate(() => {
-      const title = (window as any).slides[0].querySelector('.t-display');
-      return title ? title.style.transform : '';
+      const inner = (window as any).slides[0].querySelector('.slide-inner');
+      return inner ? inner.style.transform : '';
     });
     expect(transformAfter).toBe('');
 

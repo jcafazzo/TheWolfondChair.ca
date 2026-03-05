@@ -1440,27 +1440,39 @@ function resetSlideScroll(slideEl) {
   slideEl.scrollTop = 0;
   slideEl.style.transform = '';
   slideEl.style.transformOrigin = '';
-  // Clear FLIP transition on .slide-inner
+  // Clear FLIP transition and Ken Burns on .slide-inner
   var inner = slideEl.querySelector('.slide-inner');
-  if (inner) { inner.style.transform = ''; inner.style.transition = ''; }
-  // Clear targeted Ken Burns transforms
-  var kbTargets = slideEl.querySelectorAll('.t-display, .t-heading');
-  for (var k = 0; k < kbTargets.length; k++) {
-    kbTargets[k].style.transform = '';
-    kbTargets[k].style.transformOrigin = '';
+  if (inner) { inner.style.transform = ''; inner.style.transition = ''; inner.style.transformOrigin = ''; }
+  // Clear Ken Burns transforms on all potential target/counter-scaled elements
+  var kbEls = slideEl.querySelectorAll('.t-display, .t-heading, .t-caption, .t-body');
+  for (var k = 0; k < kbEls.length; k++) {
+    kbEls[k].style.transform = '';
+    kbEls[k].style.transformOrigin = '';
   }
 }
 
-var kenBurnsTarget = null; // the DOM element receiving the zoom (title h1 or closing h2)
+var kenBurnsTarget = null;   // DOM element receiving the zoom transform
+var kenBurnsExclude = [];    // elements to counter-scale (stay visually still)
 
 function startKenBurns(slideEl) {
-  // Target only the title text element, not the entire slide
+  kenBurnsExclude = [];
   if (current === 0) {
-    kenBurnsTarget = slideEl.querySelector('.t-display');
+    // Cover slide: zoom .slide-inner so the whole view zooms cinematically,
+    // but counter-scale the non-title children so only the h1 title visually grows.
+    kenBurnsTarget = slideEl.querySelector('.slide-inner');
+    if (kenBurnsTarget) {
+      var kids = kenBurnsTarget.children;
+      for (var c = 0; c < kids.length; c++) {
+        if (!kids[c].classList.contains('t-display')) {
+          kenBurnsExclude.push(kids[c]);
+        }
+      }
+    }
   } else {
-    kenBurnsTarget = slideEl.querySelector('.t-display') || slideEl.querySelector('.t-heading');
+    // Closing slide (or any other): zoom the whole slide element
+    kenBurnsTarget = slideEl;
   }
-  if (!kenBurnsTarget) kenBurnsTarget = slideEl; // fallback to whole slide
+  if (!kenBurnsTarget) kenBurnsTarget = slideEl;
   autoScrollActive = true;
   autoScrollStartTime = performance.now();
   autoScrollPaused = true;
@@ -1480,14 +1492,19 @@ function kenBurnsTick(timestamp) {
   }
   var KB_DURATION_MS = 20000; // 20-second ease-in-out zoom cycle
   var elapsed = timestamp - autoScrollStartTime;
-  // Ease in-out: scale 1.0 → 1.4 over 20s using quadratic easing
   var t = Math.min(elapsed / KB_DURATION_MS, 1.0);
   var eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   var scale = 1 + (0.40 * eased);
   if (kenBurnsTarget) {
     kenBurnsTarget.style.transform = 'scale(' + scale + ')';
     kenBurnsTarget.style.transformOrigin = 'center center';
-    kenBurnsTarget.style.display = 'inline-block'; // ensure transform works on inline elements
+  }
+  // Counter-scale excluded elements so they stay visually the same size
+  // while their position drifts slightly outward (subtle parallax)
+  var inv = 1 / scale;
+  for (var e = 0; e < kenBurnsExclude.length; e++) {
+    kenBurnsExclude[e].style.transform = 'scale(' + inv + ')';
+    kenBurnsExclude[e].style.transformOrigin = 'center center';
   }
   if (t < 1.0) {
     autoScrollRAF = requestAnimationFrame(kenBurnsTick);
@@ -1497,18 +1514,19 @@ function kenBurnsTick(timestamp) {
 }
 
 function stopKenBurns() {
-  // Clear transforms from slides (legacy) and from targeted elements
   for (var i = 0; i < slides.length; i++) {
     slides[i].style.transform = '';
     slides[i].style.transformOrigin = '';
-    // Clear any targeted Ken Burns elements within each slide
-    var targets = slides[i].querySelectorAll('.t-display, .t-heading');
-    for (var j = 0; j < targets.length; j++) {
-      targets[j].style.transform = '';
-      targets[j].style.transformOrigin = '';
+    var inner = slides[i].querySelector('.slide-inner');
+    if (inner) { inner.style.transform = ''; inner.style.transformOrigin = ''; }
+    var els = slides[i].querySelectorAll('.t-display, .t-heading, .t-caption, .t-body');
+    for (var j = 0; j < els.length; j++) {
+      els[j].style.transform = '';
+      els[j].style.transformOrigin = '';
     }
   }
   kenBurnsTarget = null;
+  kenBurnsExclude = [];
 }
 
 // ═══ ENGINE ═══
