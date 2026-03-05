@@ -222,6 +222,49 @@ body[data-kiosk] .cover .slide-inner {
   position: relative; z-index: 1;
 }
 
+/* ═══ Portrait mode: physically-rotated monitor (90° CW mount → CSS rotates -90°) ═══
+   The monitor is mounted portrait but the OS still reports a landscape viewport.
+   We rotate the entire body -90° and swap width↔height so content fills the
+   portrait screen correctly.  Inside the rotated body, CSS "vw" = physical height
+   (the tall dimension) and CSS "vh" = physical width (the narrow dimension). */
+body[data-portrait] {
+  transform-origin: top left;
+  transform: translateY(100vh) rotate(-90deg);
+  width: 100vh;
+  height: 100vw;
+  overflow: hidden;
+}
+body[data-portrait] .deck {
+  height: 100vw;
+}
+body[data-portrait] .slide-inner {
+  min-height: 100vw;
+}
+body[data-portrait] .split-image {
+  min-height: 100dvw;
+}
+/* Typography: swap vw → vh so sizes reference the visual width (narrow dimension) */
+body[data-portrait] .t-display { font-size: clamp(2.8rem, 7vh, 6.5rem); }
+body[data-portrait] .t-heading { font-size: clamp(2rem, 4vh, 3.8rem); }
+body[data-portrait] .t-subheading { font-size: clamp(1.4rem, 2.5vh, 2rem); }
+body[data-portrait] .t-body { font-size: clamp(0.95rem, 1.1vh, 1.1rem); }
+/* Split layout: stack vertically in portrait (narrow screen) */
+body[data-portrait] .split .slide-inner,
+body[data-portrait] .split-reverse .slide-inner {
+  grid-template-columns: 1fr;
+}
+body[data-portrait] .split-image {
+  min-height: 40vw;
+  order: -1;
+}
+body[data-portrait] .split-text {
+  padding: 3rem 2rem;
+}
+/* Video modal: constrain to visual width */
+body[data-portrait] .video-modal-inner {
+  width: 90vh;
+}
+
 /* ═══ Nav theme: light slides ═══ */
 body[data-nav-theme="light"] .topbar-logo { color: var(--black); }
 body[data-nav-theme="light"] .topbar-domain { color: var(--black); }
@@ -1330,6 +1373,16 @@ function exitKiosk() {
   startAutoAdvance();
 }
 
+function enterPortrait() {
+  isPortraitMode = true;
+  document.body.setAttribute('data-portrait', '');
+}
+
+function exitPortrait() {
+  isPortraitMode = false;
+  document.body.removeAttribute('data-portrait');
+}
+
 document.addEventListener('mousemove', () => {
   if (isKioskMode) {
     document.body.style.cursor = '';
@@ -1534,6 +1587,7 @@ var current = 0;
 var slides = [];
 var isTransitioning = false;
 var isKioskMode = false;
+var isPortraitMode = false;
 var cursorHideTimer = null;
 
 function init() {
@@ -1554,8 +1608,12 @@ function init() {
   setupConvoAutoplay();
   startAutoAdvance();
 
-  // ?kiosk URL param — enter kiosk mode without keyboard
-  if (new URLSearchParams(window.location.search).has('kiosk')) {
+  // URL params — enter modes without keyboard
+  var params = new URLSearchParams(window.location.search);
+  if (params.has('portrait')) {
+    enterPortrait();
+  }
+  if (params.has('kiosk')) {
     enterKiosk();
   }
 }
@@ -1642,7 +1700,7 @@ function updateCounter() {
   document.getElementById('progressFill').style.width = pct + '%';
 }
 
-// Keyboard — arrow keys only (K key toggles kiosk mode)
+// Keyboard — K toggles kiosk, P toggles portrait, arrows navigate
 document.addEventListener('keydown', (e) => {
   if (e.key === 'k' || e.key === 'K') {
     e.preventDefault();
@@ -1650,9 +1708,15 @@ document.addEventListener('keydown', (e) => {
     else enterKiosk();
     return;
   }
+  if (e.key === 'p' || e.key === 'P') {
+    e.preventDefault();
+    if (isPortraitMode) exitPortrait();
+    else enterPortrait();
+    return;
+  }
   if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); return; }
   if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); return; }
-  if (isKioskMode) return; // suppress all other keys in kiosk (arrows allowed above)
+  if (isKioskMode) return; // suppress all other keys in kiosk (arrows/P allowed above)
 });
 
 // Kiosk mouse-edge navigation — push cursor to right edge to advance, left edge to go back
@@ -1661,11 +1725,14 @@ var kioskEdgeCooldown = false;
 document.addEventListener('mousemove', (e) => {
   if (!isKioskMode || kioskEdgeCooldown || isTransitioning) return;
   var zone = 40; // px from edge
-  if (e.clientX >= window.innerWidth - zone) {
+  // In portrait mode, physical right/left edges map to bottom/top of the OS viewport
+  var pos = isPortraitMode ? e.clientY : e.clientX;
+  var size = isPortraitMode ? window.innerHeight : window.innerWidth;
+  if (pos >= size - zone) {
     kioskEdgeCooldown = true;
     nextSlide();
     setTimeout(function() { kioskEdgeCooldown = false; }, 1200);
-  } else if (e.clientX <= zone) {
+  } else if (pos <= zone) {
     kioskEdgeCooldown = true;
     prevSlide();
     setTimeout(function() { kioskEdgeCooldown = false; }, 1200);
@@ -1677,9 +1744,9 @@ document.addEventListener('click', (e) => {
   if (isKioskMode) return; // suppress all clicks in kiosk
   // Ignore clicks on interactive elements
   if (e.target.closest('a, button, input, select, textarea, iframe, .convo-thumb, .scroll-content, .slide-arrow, .slide-dot, .slide-nav, .topbar, .video-modal, .pub-filter, .video-mute-btn, .tl-feature')) return;
-  const x = e.clientX;
-  const w = window.innerWidth;
-  if (x > w / 2) nextSlide();
+  var pos = isPortraitMode ? e.clientY : e.clientX;
+  var size = isPortraitMode ? window.innerHeight : window.innerWidth;
+  if (pos > size / 2) nextSlide();
   else prevSlide();
 });
 
