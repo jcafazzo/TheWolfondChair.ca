@@ -1655,6 +1655,23 @@ document.addEventListener('keydown', (e) => {
   if (isKioskMode) return; // suppress all other keys in kiosk (arrows allowed above)
 });
 
+// Kiosk mouse-edge navigation — push cursor to right edge to advance, left edge to go back
+// No click needed; the cursor hitting the edge zone triggers navigation with a cooldown.
+var kioskEdgeCooldown = false;
+document.addEventListener('mousemove', (e) => {
+  if (!isKioskMode || kioskEdgeCooldown || isTransitioning) return;
+  var zone = 40; // px from edge
+  if (e.clientX >= window.innerWidth - zone) {
+    kioskEdgeCooldown = true;
+    nextSlide();
+    setTimeout(function() { kioskEdgeCooldown = false; }, 1200);
+  } else if (e.clientX <= zone) {
+    kioskEdgeCooldown = true;
+    prevSlide();
+    setTimeout(function() { kioskEdgeCooldown = false; }, 1200);
+  }
+});
+
 // Tap-to-navigate — tap right side to advance, left side to go back
 document.addEventListener('click', (e) => {
   if (isKioskMode) return; // suppress all clicks in kiosk
