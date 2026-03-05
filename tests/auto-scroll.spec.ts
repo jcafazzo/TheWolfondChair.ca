@@ -106,8 +106,10 @@ test.describe('Auto-Scroll', () => {
     });
     expect(scrollTop).toBe(0);
 
+    // Ken Burns now targets the title text element (.t-display), not the whole slide
     const transform = await page.evaluate(() => {
-      return (window as any).slides[0].style.transform;
+      const title = (window as any).slides[0].querySelector('.t-display');
+      return title ? title.style.transform : '';
     });
     expect(transform).toContain('scale');
 
@@ -195,7 +197,7 @@ test.describe('Auto-Scroll', () => {
   });
 
   test('Ken Burns zoom resets on new slide', async ({ page }) => {
-    // Slide 0 is short (cover) — gets Ken Burns
+    // Slide 0 is short (cover) — gets Ken Burns on the title element
     expect(await getCurrentSlideIndex(page)).toBe(0);
 
     // Enter kiosk
@@ -203,9 +205,10 @@ test.describe('Auto-Scroll', () => {
     // Wait for zoom (no pause)
     await page.waitForTimeout(2000);
 
-    // Verify zoom is applied
+    // Verify zoom is applied to the title text element
     const transformBefore = await page.evaluate(() => {
-      return (window as any).slides[0].style.transform;
+      const title = (window as any).slides[0].querySelector('.t-display');
+      return title ? title.style.transform : '';
     });
     expect(transformBefore).toContain('scale');
 
@@ -213,9 +216,10 @@ test.describe('Auto-Scroll', () => {
     await page.evaluate(() => (window as any).goToSlide(1));
     await page.waitForTimeout(1050); // 850ms transition + 200ms buffer
 
-    // Slide 0's transform should be reset
+    // Slide 0's title transform should be reset
     const transformAfter = await page.evaluate(() => {
-      return (window as any).slides[0].style.transform;
+      const title = (window as any).slides[0].querySelector('.t-display');
+      return title ? title.style.transform : '';
     });
     expect(transformAfter).toBe('');
 

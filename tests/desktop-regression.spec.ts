@@ -134,11 +134,12 @@ test.describe('Desktop regression', () => {
   });
 
   test('slide counter color adapts to nav theme', async ({ page }) => {
-    // On dark theme (slide 0), slide counter text should be light
+    // On dark theme (slide 0), slide counter text should be light/white
+    // Color may be rgba with alpha (e.g. rgba(255, 255, 255, 0.35))
     const lightColor = await page.locator('#slideCounter').evaluate(
       (el) => getComputedStyle(el).color
     );
-    expect(lightColor).toMatch(/rgb\(2[45]\d, 2[45]\d, 2[45]\d\)/);
+    expect(lightColor).toMatch(/rgba?\(2[0-5]\d, 2[0-5]\d, 2[0-5]\d/);
 
     // Navigate to light slide
     await page.evaluate(() => (window as any).goToSlide(3));

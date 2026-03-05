@@ -182,13 +182,34 @@ body[data-kiosk] .slide {
   scrollbar-width: none;
 }
 body[data-kiosk] .slide::-webkit-scrollbar { display: none; }
-/* ═══ Kiosk: vertically center content on short slides ═══ */
-body[data-kiosk] .slide.kiosk-short {
-  align-items: center;
-  justify-content: center;
+/* ═══ Kiosk: vertically center content on short slides ═══
+   Uses justify-content on .slide-inner (not align-items on .slide) so that
+   min-height: 100svh is preserved.  Short slides: content is centered within
+   the full-viewport .slide-inner.  Tall slides: .slide-inner grows beyond
+   100svh → no distributable space → justify-content has zero effect → content
+   stays at top and scrolls normally.  No per-slide class toggle required. */
+body[data-kiosk] .slide-inner {
+  justify-content: center !important;
 }
-body[data-kiosk] .slide.kiosk-short .slide-inner {
-  min-height: auto;
+/* ═══ Kiosk: subtle ambient motion for static slides ═══ */
+@keyframes kioskAmbient {
+  0%   { background-position: 0% 0%; }
+  25%  { background-position: 100% 50%; }
+  50%  { background-position: 50% 100%; }
+  75%  { background-position: 0% 50%; }
+  100% { background-position: 0% 0%; }
+}
+body[data-kiosk] .dark-slide::after,
+body[data-kiosk] .cover::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255,255,255,0.03) 0%, transparent 70%);
+  background-size: 200% 200%;
+  animation: kioskAmbient 25s ease-in-out infinite;
+}
+body[data-kiosk] .dark-slide .slide-inner,
+body[data-kiosk] .cover .slide-inner {
+  position: relative; z-index: 1;
 }
 
 /* ═══ Nav theme: light slides ═══ */
@@ -280,12 +301,13 @@ body[data-nav-theme="light"] .progress-fill { background: rgba(0,0,0,0.25); }
 .full-image { background-size: cover; background-position: center; color: var(--white); }
 .full-image::before {
   content: ''; position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.3) 100%);
+  background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.5) 100%);
   z-index: 1;
 }
-.full-image .slide-inner { position: relative; z-index: 2; align-items: flex-end; padding-bottom: 6rem; }
-.full-image .t-body { color: rgba(255,255,255,0.6); }
-.full-image .t-caption { color: rgba(255,255,255,0.35); }
+.full-image .slide-inner { position: relative; z-index: 2; align-items: flex-start; padding-top: 6rem; }
+.full-image .t-heading { text-shadow: 0 2px 16px rgba(0,0,0,0.5); }
+.full-image .t-body { color: rgba(255,255,255,0.7); text-shadow: 0 1px 8px rgba(0,0,0,0.4); }
+.full-image .t-caption { color: rgba(255,255,255,0.45); text-shadow: 0 1px 6px rgba(0,0,0,0.3); }
 
 .dark-slide { background: var(--black); color: var(--white); }
 .dark-slide .t-body { color: rgba(255,255,255,0.55); }
@@ -1235,29 +1257,66 @@ function clearCursorHideTimer() {
 }
 function enterKiosk() {
   isKioskMode = true;
+  var slideEl = slides[current];
+  var inner = slideEl ? slideEl.querySelector('.slide-inner') : null;
+  var probe = inner ? inner.firstElementChild : null;
+
+  // FLIP technique: record content position BEFORE kiosk layout change
+  var firstY = probe ? probe.getBoundingClientRect().top : 0;
+
   document.body.setAttribute('data-kiosk', '');
-  startAutoAdvance(); // fresh timer from current slide
-  startAutoScroll(); // classifies current slide synchronously (no jump)
-  // Request fullscreen
+
+  // FLIP: compare with position AFTER layout change and animate the delta
+  if (probe && inner) {
+    var lastY = probe.getBoundingClientRect().top;
+    var deltaY = firstY - lastY;
+    if (Math.abs(deltaY) > 1) {
+      inner.style.transform = 'translateY(' + deltaY + 'px)';
+      inner.getBoundingClientRect(); // force reflow so transform is applied
+      inner.style.transition = 'transform 0.45s ease-out';
+      inner.style.transform = '';
+      setTimeout(function() { inner.style.transition = ''; }, 500);
+    }
+  }
+
+  startAutoAdvance();
+  startAutoScroll();
   if (document.documentElement.requestFullscreen) {
     document.documentElement.requestFullscreen().catch(() => {});
   }
-  // Start cursor hide timer
   startCursorHideTimer();
 }
 function exitKiosk() {
   isKioskMode = false;
+  var slideEl = slides[current];
+  var inner = slideEl ? slideEl.querySelector('.slide-inner') : null;
+  var probe = inner ? inner.firstElementChild : null;
+
+  // FLIP: record content position BEFORE removing kiosk layout
+  var firstY = probe ? probe.getBoundingClientRect().top : 0;
+
   document.body.removeAttribute('data-kiosk');
+
+  // FLIP: animate back to original position smoothly
+  if (probe && inner) {
+    var lastY = probe.getBoundingClientRect().top;
+    var deltaY = firstY - lastY;
+    if (Math.abs(deltaY) > 1) {
+      inner.style.transform = 'translateY(' + deltaY + 'px)';
+      inner.getBoundingClientRect();
+      inner.style.transition = 'transform 0.45s ease-out';
+      inner.style.transform = '';
+      setTimeout(function() { inner.style.transition = ''; }, 500);
+    }
+  }
+
   stopAutoAdvance();
   stopAutoScroll();
   for (var i = 0; i < slides.length; i++) { resetSlideScroll(slides[i]); }
-  // Exit fullscreen if active
   if (document.fullscreenElement) {
     document.exitFullscreen().catch(() => {});
   }
-  // Clear cursor hide timer, restore cursor
   clearCursorHideTimer();
-  // Restart normal auto-advance
   startAutoAdvance();
 }
 
@@ -1317,15 +1376,13 @@ function startAutoScroll() {
   // Check if slide has scrollable content (single unified scroll, no embedded areas)
   if (slideEl.scrollHeight - slideEl.clientHeight > 10) {
     // Tall slide — auto-scroll from top to bottom
-    slideEl.classList.remove('kiosk-short');
     slideEl.scrollTop = 0;
     autoScrollActive = true;
     autoScrollPaused = true;
     autoScrollStartTime = performance.now();
     autoScrollRAF = requestAnimationFrame(autoScrollTick);
   } else {
-    // Short slide — vertical centering
-    slideEl.classList.add('kiosk-short');
+    // Short slide — centering handled by CSS (justify-content: center on .slide-inner)
     // Ken Burns zoom only on title (slide 0) and thank-you (last slide)
     if (current === 0 || current === slides.length - 1) {
       startKenBurns(slideEl);
@@ -1373,10 +1430,27 @@ function resetSlideScroll(slideEl) {
   slideEl.scrollTop = 0;
   slideEl.style.transform = '';
   slideEl.style.transformOrigin = '';
-  slideEl.classList.remove('kiosk-short');
+  // Clear FLIP transition on .slide-inner
+  var inner = slideEl.querySelector('.slide-inner');
+  if (inner) { inner.style.transform = ''; inner.style.transition = ''; }
+  // Clear targeted Ken Burns transforms
+  var kbTargets = slideEl.querySelectorAll('.t-display, .t-heading');
+  for (var k = 0; k < kbTargets.length; k++) {
+    kbTargets[k].style.transform = '';
+    kbTargets[k].style.transformOrigin = '';
+  }
 }
 
+var kenBurnsTarget = null; // the DOM element receiving the zoom (title h1 or closing h2)
+
 function startKenBurns(slideEl) {
+  // Target only the title text element, not the entire slide
+  if (current === 0) {
+    kenBurnsTarget = slideEl.querySelector('.t-display');
+  } else {
+    kenBurnsTarget = slideEl.querySelector('.t-display') || slideEl.querySelector('.t-heading');
+  }
+  if (!kenBurnsTarget) kenBurnsTarget = slideEl; // fallback to whole slide
   autoScrollActive = true;
   autoScrollStartTime = performance.now();
   autoScrollPaused = true;
@@ -1394,15 +1468,17 @@ function kenBurnsTick(timestamp) {
       return;
     }
   }
-  var slideEl = slides[current];
   var KB_DURATION_MS = 20000; // 20-second ease-in-out zoom cycle
   var elapsed = timestamp - autoScrollStartTime;
   // Ease in-out: scale 1.0 → 1.4 over 20s using quadratic easing
   var t = Math.min(elapsed / KB_DURATION_MS, 1.0);
-  var eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; // ease-in-out quad
+  var eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   var scale = 1 + (0.40 * eased);
-  slideEl.style.transform = 'scale(' + scale + ')';
-  slideEl.style.transformOrigin = 'center center';
+  if (kenBurnsTarget) {
+    kenBurnsTarget.style.transform = 'scale(' + scale + ')';
+    kenBurnsTarget.style.transformOrigin = 'center center';
+    kenBurnsTarget.style.display = 'inline-block'; // ensure transform works on inline elements
+  }
   if (t < 1.0) {
     autoScrollRAF = requestAnimationFrame(kenBurnsTick);
   } else {
@@ -1411,11 +1487,18 @@ function kenBurnsTick(timestamp) {
 }
 
 function stopKenBurns() {
+  // Clear transforms from slides (legacy) and from targeted elements
   for (var i = 0; i < slides.length; i++) {
     slides[i].style.transform = '';
     slides[i].style.transformOrigin = '';
-    slides[i].classList.remove('kiosk-short');
+    // Clear any targeted Ken Burns elements within each slide
+    var targets = slides[i].querySelectorAll('.t-display, .t-heading');
+    for (var j = 0; j < targets.length; j++) {
+      targets[j].style.transform = '';
+      targets[j].style.transformOrigin = '';
+    }
   }
+  kenBurnsTarget = null;
 }
 
 // ═══ ENGINE ═══
@@ -1464,14 +1547,8 @@ function goToSlide(index) {
   const next = slides[index];
   prev.classList.remove('active');
   prev.classList.add('exiting');
-  // Pre-classify incoming slide BEFORE it becomes visible to prevent centering jump
-  if (isKioskMode) {
-    if (next.scrollHeight - next.clientHeight > 10) {
-      next.classList.remove('kiosk-short');
-    } else {
-      next.classList.add('kiosk-short');
-    }
-  }
+  // Centering is handled by CSS (body[data-kiosk] .slide-inner justify-content)
+  // — no per-slide class toggle needed, so no centering jump possible
   next.classList.add('active');
   setTimeout(() => { prev.classList.remove('exiting'); isTransitioning = false; }, 800);
   current = index;
